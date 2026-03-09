@@ -27,6 +27,17 @@ indice_consistente = (df[semanas]==0).sum(axis=1).idxmin()     # Menos semanas e
 indice_rey_semanal = (df[rank_semanas]==1).sum(axis=1).idxmax() # Más semanas en #1
 
 # -------------------------------
+# Mejor tiempo rankings
+# -------------------------------
+df["Mejor Semana Mes1"] = df[semanas[:4]].max(axis=1)
+df["Mejor Semana Mes2"] = df[semanas[4:]].max(axis=1)
+df["Mejor Semana General"] = df[semanas].max(axis=1)
+
+df["Rank Mejor Tiempo M1"] = df["Mejor Semana Mes1"].rank(method='min', ascending=False).astype(int)
+df["Rank Mejor Tiempo M2"] = df["Mejor Semana Mes2"].rank(method='min', ascending=False).astype(int)
+df["Rank Mejor Tiempo General"] = df["Mejor Semana General"].rank(method='min', ascending=False).astype(int)
+
+# -------------------------------
 # Título de la app
 # -------------------------------
 st.title("🏃 Cuatachos Wrapped")
@@ -95,7 +106,20 @@ if nombre:
     if nombre == df.loc[indice_rey_semanal, "Nombre"]:
         st.info(f"🏆 Eres el rey/reina del podio semanal con {semanas_num1} semanas en #1")
 
+    # -------------------------------
+    # Mejor tiempo rankings
+    # -------------------------------
+    rank_m1 = df.loc[df["Nombre"] == nombre, "Rank Mejor Tiempo M1"].values[0]
+    rank_m2 = df.loc[df["Nombre"] == nombre, "Rank Mejor Tiempo M2"].values[0]
+    rank_gen = df.loc[df["Nombre"] == nombre, "Rank Mejor Tiempo General"].values[0]
+
+    st.info(f"⏱ ¡Felicidades! Ostentas el {rank_m1}{'º' if rank_m1!=1 else 'er'} mejor tiempo del mes 1, "
+            f"el {rank_m2}{'º' if rank_m2!=1 else 'er'} mejor del mes 2 y "
+            f"el {rank_gen}{'º' if rank_gen!=1 else 'er'} mejor general")
+
+    # -------------------------------
     # Semanas en 0
+    # -------------------------------
     if semanas_cero == 0:
         st.success("¡Ejercitaste todas las semanas! 🔥")
     else:
