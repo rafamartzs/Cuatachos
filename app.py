@@ -73,6 +73,18 @@ if nombre:
     semanas_num1 = (rankings == 1).sum()
 
     # -------------------------------
+    # Mejor tiempo y semana correspondiente
+    # -------------------------------
+    mejor_tiempo_m1 = minutos[:4].max()
+    semana_mejor_m1 = minutos[:4].idxmax()
+
+    mejor_tiempo_m2 = minutos[4:].max()
+    semana_mejor_m2 = minutos[4:].idxmax()
+
+    mejor_tiempo_gen = minutos.max()
+    semana_mejor_gen = minutos.idxmax()
+
+    # -------------------------------
     # Mostrar estadísticas
     # -------------------------------
     st.header(f"Hola {nombre}! 👋")
@@ -87,7 +99,13 @@ if nombre:
     st.write(f"Mejor posición mes 2: **#{mejor_pos_mes2}**")
 
     # -------------------------------
-    # Mensajes por consistencia y desempeño
+    # Mensaje de estabilidad
+    # -------------------------------
+    if desviacion < 15:
+        st.success("🏅 ¡Felicidades! Eres de los atletas más estables")
+
+    # -------------------------------
+    # Premios automáticos
     # -------------------------------
     if nombre == df.loc[indice_estable, "Nombre"]:
         st.success(f"🏅 ¡Felicidades! Eres el atleta más estable, con desviación estándar de {desviacion:.2f} minutos")
@@ -116,6 +134,13 @@ if nombre:
     st.info(f"⏱ ¡Felicidades! Ostentas el {rank_m1}{'º' if rank_m1!=1 else 'er'} mejor tiempo del mes 1, "
             f"el {rank_m2}{'º' if rank_m2!=1 else 'er'} mejor del mes 2 y "
             f"el {rank_gen}{'º' if rank_gen!=1 else 'er'} mejor general")
+
+    # -------------------------------
+    # Mostrar semana y minutos de mejor tiempo
+    # -------------------------------
+    st.info(f"🥇 Mejor semana mes 1: **{semana_mejor_m1}** con **{mejor_tiempo_m1} minutos**")
+    st.info(f"🥇 Mejor semana mes 2: **{semana_mejor_m2}** con **{mejor_tiempo_m2} minutos**")
+    st.info(f"🥇 Mejor semana general: **{semana_mejor_gen}** con **{mejor_tiempo_gen} minutos**")
 
     # -------------------------------
     # Semanas en 0
