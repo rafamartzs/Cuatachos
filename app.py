@@ -219,9 +219,9 @@ if nombre and nombre != "🏆 Salón de la Fama":
     st.write(f"Tu posición en el ranking general: **#{ranking_general}**")
 
     if ranking_mes2 < ranking_mes1:
-        flecha = "⬇️"
-    elif ranking_mes2 > ranking_mes1:
         flecha = "⬆️"
+    elif ranking_mes2 > ranking_mes1:
+        flecha = "⬇️"
     else:
         flecha = "➡️"
 
@@ -236,7 +236,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
     if semanas_num1:
         st.success(f"🏆 Fuiste MVP en las semanas {', '.join(map(str,semanas_num1))}")
 
-    if desviacion < 15:
+    if desviacion < 100:
         st.success("😎 ¡Eres de los atletas más estables!")
 
     st.info(f"⚡ Tu mayor salto fue de {brinco_max} minutos ({semana_brinco})")
