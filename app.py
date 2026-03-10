@@ -261,35 +261,30 @@ if nombre and nombre != "🏆 Salón de la Fama":
 # GRÁFICAS GENERALES
 # =================================================
 
-st.subheader("📊 Ranking de minutos Mes 2")
+  # Ranking minutos mes 2
+    st.subheader("📊 Ranking de minutos Mes 2")
+    df_mes2 = df[["Nombre"] + semanas[4:8]].copy()
+    df_mes2["Total Mes2"] = df_mes2[semanas[4:8]].sum(axis=1)
+    df_mes2_sorted = df_mes2.sort_values("Total Mes2", ascending=False)
+    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes2_sorted["Nombre"]]
+    fig2, ax2 = plt.subplots(figsize=(10,5))
+    ax2.bar(df_mes2_sorted["Nombre"], df_mes2_sorted["Total Mes2"], color=colors)
+    ax2.set_ylabel("Minutos Mes 2")
+    ax2.set_xlabel("Atletas")
+    ax2.set_title("Ranking de minutos Mes 2")
+    plt.xticks(rotation=45, ha="right")
+    st.pyplot(fig2)
 
-df_mes2 = df[["Nombre"] + semanas[4:]].copy()
-
-df_mes2["Total Mes2"] = df_mes2[semanas[4:]].sum(axis=1)
-
-df_mes2_sorted = df_mes2.sort_values("Total Mes2",ascending=False)
-
-fig2, ax2 = plt.subplots()
-
-ax2.bar(df_mes2_sorted["Nombre"], df_mes2_sorted["Total Mes2"])
-
-plt.xticks(rotation=45)
-
-st.pyplot(fig2)
-
-
-st.subheader("📊 Ranking de minutos General")
-
-df_total = df[["Nombre"] + semanas].copy()
-
-df_total["Total General"] = df_total[semanas].sum(axis=1)
-
-df_total_sorted = df_total.sort_values("Total General",ascending=False)
-
-fig3, ax3 = plt.subplots()
-
-ax3.bar(df_total_sorted["Nombre"], df_total_sorted["Total General"])
-
-plt.xticks(rotation=45)
-
-st.pyplot(fig3)
+ # Ranking minutos totales
+    st.subheader("📊 Ranking de minutos Total General")
+    df_total = df[["Nombre"] + semanas].copy()
+    df_total["Total General"] = df_total[semanas].sum(axis=1)
+    df_total_sorted = df_total.sort_values("Total General", ascending=False)
+    colors_total = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_total_sorted["Nombre"]]
+    fig3, ax3 = plt.subplots(figsize=(10,5))
+    ax3.bar(df_total_sorted["Nombre"], df_total_sorted["Total General"], color=colors_total)
+    ax3.set_ylabel("Minutos Totales")
+    ax3.set_xlabel("Atletas")
+    ax3.set_title("Ranking de minutos Total General")
+    plt.xticks(rotation=45, ha="right")
+    st.pyplot(fig3)
