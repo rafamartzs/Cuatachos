@@ -57,8 +57,6 @@ if nombre:
     # Ranking general y mejor posiciones
     # -------------------------------
     ranking_general = row["Ranking general"]
-    mejor_pos_mes1 = rankings[:4].min()
-    mejor_pos_mes2 = rankings[4:].min()
 
     # -------------------------------
     # Estadísticas básicas
@@ -85,18 +83,33 @@ if nombre:
     semana_mejor_gen = minutos.idxmax()
 
     # -------------------------------
+    # Ranking mensual con flechitas
+    # -------------------------------
+    ranking_mes1 = row["Ranking Mens. 1"]
+    ranking_mes2 = row["Ranking Mens. 2"]
+
+    if ranking_mes2 < ranking_mes1:
+        flecha = "⬆️"
+    elif ranking_mes2 > ranking_mes1:
+        flecha = "⬇️"
+    else:
+        flecha = "➡️"
+
+    # -------------------------------
     # Mostrar estadísticas
     # -------------------------------
-    st.header(f"Hola {nombre}! 👋")
+    st.header(f"¡Hola, {nombre}! 👋")
 
     st.subheader("🔥 Estadísticas principales")
-    st.write(f"Mejor tiempo en una semana: **{mejor_tiempo} minutos**")
-    st.write(f"Promedio general semanal: **{promedio_general:.1f} minutos**")
-    st.write(f"Desviación estándar: **{desviacion:.2f}**")
-    st.write(f"Contribución al total: **{porcentaje_total:.2f}%**")
-    st.write(f"Posición en ranking general: **#{ranking_general}** 🏅")
-    st.write(f"Mejor posición mes 1: **#{mejor_pos_mes1}**")
-    st.write(f"Mejor posición mes 2: **#{mejor_pos_mes2}**")
+    st.write(f"Tu mejor tiempo en una semana: **{mejor_tiempo} minutos**")
+    st.write(f"Tu promedio general semanal: **{promedio_general:.1f} minutos**")
+    st.write(f"Tu desviación estándar: **{desviacion:.2f}**")
+    st.write(f"Tu contribución al total: **{porcentaje_total:.2f}%**")
+    st.write(f"Tu posición en ranking general: **#{ranking_general}** 🏅")
+
+    # Ranking mensual con flechitas
+    st.write(f"Tu posición en el mes 1: **#{ranking_mes1}**")
+    st.write(f"Tu posición en el mes 2: **#{ranking_mes2}** {flecha}")
 
     # -------------------------------
     # Mensaje de estabilidad
@@ -122,7 +135,7 @@ if nombre:
         st.success("💪 ¡Consistencia perfecta! No tuviste semanas en 0 minutos")
 
     if nombre == df.loc[indice_rey_semanal, "Nombre"]:
-        st.info(f"🏆 Eres el rey/reina del podio semanal con {semanas_num1} semanas en #1")
+        st.info(f"🏆 Eres la reina del podio semanal con {semanas_num1} semanas en #1")
 
     # -------------------------------
     # Mejor tiempo rankings
@@ -140,13 +153,11 @@ if nombre:
     # -------------------------------
     st.info(f"🥇 Mejor semana mes 1: **{semana_mejor_m1}** con **{mejor_tiempo_m1} minutos**")
     st.info(f"🥇 Mejor semana mes 2: **{semana_mejor_m2}** con **{mejor_tiempo_m2} minutos**")
-    st.info(f"🥇 Mejor semana general: **{semana_mejor_gen}** con **{mejor_tiempo_gen} minutos**")
-
+  
     # -------------------------------
     # MVP Semanal
     # -------------------------------
     mvp_semanas = [semana.split()[-1] for semana, rank in zip(rank_semanas, rankings) if rank == 1]
-
     if mvp_semanas:
         st.success(f"🏆 ¡Fuiste el MVP en la semana{'s' if len(mvp_semanas)>1 else ''} {', '.join(mvp_semanas)}!")
 
@@ -175,7 +186,6 @@ if nombre:
     st.subheader("📈 Promedios por mes")
     st.write(f"Promedio mes 1: **{prom_mes1:.1f} minutos**")
     st.write(f"Promedio mes 2: **{prom_mes2:.1f} minutos**")
-
     if prom_mes2 > prom_mes1:
         st.success("¡Mejoraste en el segundo mes! 🚀")
     elif prom_mes2 < prom_mes1:
