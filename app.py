@@ -101,7 +101,7 @@ if nombre:
     # -------------------------------
     # Mensaje de estabilidad
     # -------------------------------
-    if desviacion < 15:
+    if desviacion < 100:
         st.success("🏅 ¡Felicidades! Eres de los atletas más estables")
 
     # -------------------------------
@@ -141,6 +141,14 @@ if nombre:
     st.info(f"🥇 Mejor semana mes 1: **{semana_mejor_m1}** con **{mejor_tiempo_m1} minutos**")
     st.info(f"🥇 Mejor semana mes 2: **{semana_mejor_m2}** con **{mejor_tiempo_m2} minutos**")
     st.info(f"🥇 Mejor semana general: **{semana_mejor_gen}** con **{mejor_tiempo_gen} minutos**")
+
+    # -------------------------------
+    # MVP Semanal
+    # -------------------------------
+    mvp_semanas = [semana.split()[-1] for semana, rank in zip(rank_semanas, rankings) if rank == 1]
+
+    if mvp_semanas:
+        st.success(f"🏆 ¡Fuiste el MVP en la semana{'s' if len(mvp_semanas)>1 else ''} {', '.join(mvp_semanas)}!")
 
     # -------------------------------
     # Semanas en 0
