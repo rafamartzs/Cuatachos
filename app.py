@@ -108,15 +108,15 @@ if nombre:
     # -------------------------------
     # Mostrar estadísticas
     # -------------------------------
-    st.header(f"Hola {nombre}! 👋")
+    st.header(f"¡Hola, {nombre}! 👋")
     st.subheader("🔥 Estadísticas principales")
-    st.write(f"Mejor tiempo en una semana: **{mejor_tiempo} minutos** (Semana {semana_mejor[-1]})")
-    st.write(f"Promedio general semanal: **{prom_general:.1f} minutos**")
-    st.write(f"Desviación estándar: **{desviacion:.2f}**")
-    st.write(f"Contribución al total: **{porcentaje_total:.2f}%**")
-    st.write(f"Posición en ranking general: **#{ranking_general}** 🏅")
-    st.write(f"Ranking mes 1: **#{ranking_mes1}**")
-    st.write(f"Ranking mes 2: **#{ranking_mes2}**{'⬆️' if ranking_mes1 < ranking_mes2 else '⬇️' if ranking_mes1 > ranking_mes2 else '➡️'}")
+    st.write(f"Tu mejor tiempo en una semana: **{mejor_tiempo} minutos** (Semana {semana_mejor[-1]})")
+    st.write(f"Tu promedio general semanal: **{prom_general:.1f} minutos**")
+    st.write(f"Tu desviación estándar: **{desviacion:.2f}**")
+    st.write(f"Tu contribución al total: **{porcentaje_total:.2f}%**")
+    st.write(f"Tu posición en el ranking general: **#{ranking_general}** 🏅")
+    st.write(f"Tu posición en el ranking mes 1: **#{ranking_mes1}**")
+    st.write(f"Tu posición en el ranking mes 2: **#{ranking_mes2}**{'⬇️' if ranking_mes1 < ranking_mes2 else '⬆️' if ranking_mes1 > ranking_mes2 else '➡️'}")
     
     st.write(f"⏱ ¡Felicidades! Ostentas el {pos_mejor_mes1}° mejor tiempo del mes 1, el {pos_mejor_mes2}° del mes 2 y el {pos_mejor_total}° general.")
     
@@ -124,25 +124,25 @@ if nombre:
     if semanas_cero == 0:
         st.success("¡Ejercitaste todas las semanas! 🔥")
     else:
-        st.warning(f"Tuviste {semanas_cero} semanas en 0 minutos, ¡pero sabemos que puedes mejorar!")
+        st.warning(f"Tuviste {semanas_cero} semanas en 0 minutos, ¡pero sigue adelante!")
 
     # Semanas en #1 (MVP)
     if semanas_num1:
         st.success(f"¡Fuiste MVP en las semanas {', '.join(map(str,semanas_num1))}! 🏆")
     else:
-        st.info("Aún no has alcanzado el #1 semanal, ¡pero llegará!")
+        st.info("Aún no has alcanzado el #1 semanal, ¡pero puedes lograrlo!")
 
     # Estabilidad
     if desviacion < 15:
         st.success("¡Felicidades! Eres de los atletas más estables 😎")
 
     # Brinco máximo
-    st.info(f"Tu mayor activación entre semanas consecutivas fue de {brinco_max} minutos, en {semana_brinco}.")
+    st.info(f"Tu mayor activación entre semanas consecutivas fue de +{brinco_max} minutos, en {semana_brinco}.")
 
     # Mejor semana y minutos
     st.info(f"🥇 Mejor semana mes 1: **{semana_mejor_m1}** con **{mejor_tiempo_m1} minutos**")
     st.info(f"🥇 Mejor semana mes 2: **{semana_mejor_m2}** con **{mejor_tiempo_m2} minutos**")
-    st.info(f"🥇 Mejor semana general: **{semana_mejor_gen}** con **{mejor_tiempo_gen} minutos**")
+    
 
     # -------------------------------
     # Gráfica de minutos por semana
@@ -163,7 +163,7 @@ if nombre:
     if nombre == df.loc[indice_brinco, "Nombre"]:
         salto_max = minutos.diff().abs().max()
         semana1 = minutos.diff().abs().idxmax()
-        st.info(f"⚡ Fuiste el atleta que más se activó, con un salto de {salto_max:.0f} minutos en {semana1}")
+        st.info(f"⚡ Fuiste el atleta que más se activó, con un salto de +{salto_max:.0f} minutos en {semana1}")
 
     if nombre == df.loc[indice_dominante, "Nombre"]:
         st.success(f"🔥 Eres el dominador del reto con un total de {minutos.sum()} minutos")
@@ -172,13 +172,13 @@ if nombre:
         st.success("💪 ¡Consistencia perfecta! No tuviste semanas en 0 minutos")
 
     if nombre == df.loc[indice_rey_semanal, "Nombre"]:
-        st.info(f"🏆 Eres el rey/reina del podio semanal con {semanas_num1} semanas en #1")
+        st.info(f"🏆 Eres la reina del podio semanal con {semanas_num1} semanas en #1")
 
     # -------------------------------
     # Gráficas grupales finales
     # -------------------------------
     # Ranking minutos mes 2
-    st.subheader("📊 Ranking de minutos Mes 2 (todos los atletas)")
+    st.subheader("📊 Ranking de minutos Mes 2")
     df_mes2 = df[["Nombre"] + semanas[4:8]].copy()
     df_mes2["Total Mes2"] = df_mes2[semanas[4:8]].sum(axis=1)
     df_mes2_sorted = df_mes2.sort_values("Total Mes2", ascending=False)
@@ -192,7 +192,7 @@ if nombre:
     st.pyplot(fig2)
 
     # Ranking minutos totales
-    st.subheader("📊 Ranking de minutos Total General (todos los atletas)")
+    st.subheader("📊 Ranking de minutos Total General")
     df_total = df[["Nombre"] + semanas].copy()
     df_total["Total General"] = df_total[semanas].sum(axis=1)
     df_total_sorted = df_total.sort_values("Total General", ascending=False)
