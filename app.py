@@ -243,9 +243,10 @@ if nombre and nombre != "🏆 Salón de la Fama":
     # -----------------------------------
     # TROFEOS
     # -----------------------------------
-
+    
     st.header("🏅 Trofeos")
-
+    # Posición general (siempre aparece)
+    st.info(f"🎖 Posición general actual: **#{ranking_general}**")
     mejor_global = df[semanas].max().max()
 
     if mejor == mejor_global:
@@ -304,8 +305,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     if (minutos == 0).sum() == 0:
         st.success("💎 Consistencia perfecta")
-    # Posición general (siempre aparece)
-    st.info(f"🎖 Posición general actual: **#{ranking_general}**")
+    
 # MVPs semanales del atleta
 
     for semana in semanas:
