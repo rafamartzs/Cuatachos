@@ -167,6 +167,19 @@ if nombre == "🏆 Salón de la Fama":
     semana = idx[1]
 
     st.write(f"📉 Mayor bajón histórico: **{atleta}** ({mayor_bajon} min en {semana})")
+# MVPs semanales
+
+    st.subheader("🥇 MVPs semanales")
+
+    for semana in semanas:
+ 
+        idx = df[semana].idxmax()
+
+        atleta = df.loc[idx, "Nombre"]
+
+        minutos = df.loc[idx, semana]
+
+        st.write(f"{semana} — {atleta} ({minutos} min)")
 
 # =====================================================
 # PANEL INDIVIDUAL
@@ -277,6 +290,13 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     if (minutos == 0).sum() == 0:
         st.success("💎 Consistencia perfecta")
+# MVPs semanales del atleta
+
+    for semana in semanas:
+
+        if row[semana] == df[semana].max():
+
+            st.success(f"🥇 MVP en {semana} ({row[semana]} min)")
 
    # Gráfica individual
     st.subheader("📊 Minutos por semana")
