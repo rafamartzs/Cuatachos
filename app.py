@@ -375,27 +375,27 @@ if nombre and nombre != "🏆 Salón de la Fama":
  # GRÁFICA DE EVOLUCIÓN DEL RANKING SEMANAL
  # =================================================
 
- st.subheader("📈 Evolución del ranking semanal")
+    st.subheader("📈 Evolución del ranking semanal")
 
- # Construimos un DataFrame con las posiciones semanales
- df_ranking = df[["Nombre"] + rank_semanas].copy()
+    # Construimos un DataFrame con las posiciones semanales
+    df_ranking = df[["Nombre"] + rank_semanas].copy()
 
- # Invertimos el ranking para que #1 quede arriba en la gráfica
- for col in rank_semanas:
-     df_ranking[col] = df_ranking[col]  # los rankings ya son numéricos, #1 es el mejor
+    # Invertimos el ranking para que #1 quede arriba en la gráfica
+    for col in rank_semanas:
+        df_ranking[col] = df_ranking[col]  # los rankings ya son numéricos, #1 es el mejor
 
- fig4, ax4 = plt.subplots(figsize=(12,6))
+    fig4, ax4 = plt.subplots(figsize=(12,6))
 
- for i, row in df_ranking.iterrows():
-     if row["Nombre"] == nombre:
-         ax4.plot(rank_semanas, row[rank_semanas], marker='o', linewidth=3, color="#ff69b4",      label=row["Nombre"])
-     else:
-         ax4.plot(rank_semanas, row[rank_semanas], marker='o', linewidth=1.5, alpha=0.5, color="#1f77b4")
+    for i, row in df_ranking.iterrows():
+        if row["Nombre"] == nombre:
+            ax4.plot(rank_semanas, row[rank_semanas], marker='o', linewidth=3, color="#ff69b4",      label=row["Nombre"])
+        else:
+            ax4.plot(rank_semanas, row[rank_semanas], marker='o', linewidth=1.5, alpha=0.5, color="#1f77b4")
 
- ax4.invert_yaxis()  # #1 arriba
- ax4.set_xlabel("Semanas")
- ax4.set_ylabel("Ranking")
- ax4.set_title("Evolución del ranking semanal de atletas")
- ax4.legend(loc="upper right", fontsize=10)
- plt.xticks(rotation=45)
- st.pyplot(fig4)
+    ax4.invert_yaxis()  # #1 arriba
+    ax4.set_xlabel("Semanas")
+    ax4.set_ylabel("Ranking")
+    ax4.set_title("Evolución del ranking semanal de atletas")
+    ax4.legend(loc="upper right", fontsize=10)
+    plt.xticks(rotation=45)
+    st.pyplot(fig4)
