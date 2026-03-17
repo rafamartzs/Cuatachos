@@ -278,6 +278,20 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     if nombre == df.loc[idx, "Nombre"]:
         st.success(f"📈 Mayor tendencia positiva ({tendencias.max()} semanas seguidas subiendo)")
+    # Mayor salto de activación histórico
+
+    diffs_global = df[semanas].diff(axis=1)
+
+    mayor_salto = diffs_global.max().max()
+
+    idx = diffs_global.stack().idxmax()
+
+    atleta_salto = df.loc[idx[0], "Nombre"]
+
+    semana_salto = idx[1]
+
+    if nombre == atleta_salto:
+        st.success(f"⚡ Mayor salto de activación histórico (+{mayor_salto} min en {semana_salto})")
 
     # Estabilidad
 
