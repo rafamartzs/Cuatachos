@@ -267,18 +267,32 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
 
 # Ranking minutos mes 3
-    st.subheader("📊 Ranking de minutos Mes 3")
-    df_mes3 = df[["Nombre"] + semanas[8]].copy()
-    df_mes3["Total Mes3"] = df_mes3[semanas[8]].sum(axis=1)
-    df_mes3_sorted = df_mes3.sort_values("Total Mes3", ascending=False)
-    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes3_sorted["Nombre"]]
-    fig2, ax2 = plt.subplots(figsize=(10,5))
-    ax2.bar(df_mes3_sorted["Nombre"], df_mes3_sorted["Total Mes3"], color=colors)
-    ax2.set_ylabel("Minutos Mes 3")
-    ax2.set_xlabel("Atletas")
-    ax2.set_title("Ranking de minutos Mes 3")
-    plt.xticks(rotation=45, ha="right")
-    st.pyplot(fig2)
+
+st.subheader("📊 Ranking de minutos Mes 3")
+
+ultima_semana = semanas[-1]
+
+df_mes3 = df[["Nombre", ultima_semana]].copy()
+
+df_mes3["Total Mes3"] = df_mes3[ultima_semana]
+
+df_mes3_sorted = df_mes3.sort_values("Total Mes3", ascending=False)
+
+colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes3_sorted["Nombre"]]
+
+fig2, ax2 = plt.subplots(figsize=(10,5))
+
+ax2.bar(df_mes3_sorted["Nombre"], df_mes3_sorted["Total Mes3"], color=colors)
+
+ax2.set_ylabel("Minutos Mes 3")
+
+ax2.set_xlabel("Atletas")
+
+ax2.set_title("Ranking de minutos Mes 3")
+
+plt.xticks(rotation=45, ha="right")
+
+st.pyplot(fig2)
 
  # Ranking minutos totales
     st.subheader("📊 Ranking de minutos Total General")
