@@ -6,7 +6,28 @@ import numpy as np
 st.set_page_config(page_title="Cuatachos Wrapped", layout="wide")
 
 # -----------------------------------
-# Cargar datos
+# FUNCIONES
+# -----------------------------------
+
+def tendencia_positiva(serie):
+
+    diffs = serie.diff()
+
+    count = 0
+    best = 0
+
+    for d in diffs[1:]:
+
+        if d > 0:
+            count += 1
+            best = max(best, count)
+        else:
+            count = 0
+
+    return best
+
+# -----------------------------------
+# CARGAR DATOS
 # -----------------------------------
 
 df = pd.read_excel("reto_cuatachos.xlsx")
@@ -16,8 +37,6 @@ rank_semanas = [c for c in df.columns if "Ranking " in c and "Mens" not in c and
 
 ultima_semana = semanas[-1]
 semana_previa = semanas[-2]
-
-num_semana_actual = int(ultima_semana.split()[1])
 
 total_minutos_global = df[semanas].sum().sum()
 
@@ -36,10 +55,6 @@ nombre = st.selectbox("Selecciona tu nombre", opciones, index=None)
 if nombre == "🏆 Salón de la Fama":
 
     st.title("🏆 Salón de la Fama del Reto")
-
-    # -----------------------------------
-    # SEMANA RECIENTE
-    # -----------------------------------
 
     st.header(f"🔥 Lo que pasó en la {ultima_semana}")
 
@@ -60,9 +75,7 @@ if nombre == "🏆 Salón de la Fama":
     atleta_relajado = df.loc[idx_relajaron, "Nombre"]
 
     st.write(f"👟 Atletas moviéndose: **{atletas_moviendose}**")
-
     st.write(f"⏱ Minutos totales: **{minutos_totales}**")
-
     st.write(f"📊 Promedio entre atletas activos: **{promedio:.1f}**")
 
     if despertaron:
@@ -70,14 +83,13 @@ if nombre == "🏆 Salón de la Fama":
         st.write(", ".join(despertaron))
 
     st.write(f"⚡ Mayor activación: **{atleta_activacion}** (+{diff.max()} min)")
-
     st.write(f"😴 Mayor relajación: **{atleta_relajado}** ({diff.min()} min)")
 
     st.subheader("🥇 Top 3 de la semana")
 
     top3_semana = df.sort_values(ultima_semana, ascending=False).head(3)
 
-    for i, row in top3_semana.iterrows():
+    for _, row in top3_semana.iterrows():
         st.write(f"{row['Nombre']} — {row[ultima_semana]} min")
 
     # -----------------------------------
@@ -85,8 +97,6 @@ if nombre == "🏆 Salón de la Fama":
     # -----------------------------------
 
     st.header("🏛️ Récords del reto")
-
-    # TOP 3 mejores semanas
 
     records = []
 
@@ -100,10 +110,8 @@ if nombre == "🏆 Salón de la Fama":
 
     st.subheader("🥇 Mejores semanas históricas")
 
-    for i, r in top3.iterrows():
+    for _, r in top3.iterrows():
         st.write(f"{r['Nombre']} — {r['Semana']} — {r['Minutos']} min")
-
-    # Semana con más minutos
 
     totales_semana = df[semanas].sum()
 
@@ -111,17 +119,18 @@ if nombre == "🏆 Salón de la Fama":
 
     st.write(f"📈 Semana con más minutos: **{semana_record}** ({totales_semana.max()} min)")
 
-    # Estabilidad (ignorando ceros)
+    # Estabilidad
 
     df_std = df[semanas].replace(0, np.nan).std(axis=1)
 
-    atleta_estable = df.loc[df_std.idxmin(), "Nombre"]
+    idx_estable = df_std.idxmin()
+    idx_variable = df_std.idxmax()
 
-    atleta_variable = df.loc[df_std.idxmax(), "Nombre"]
+    atleta_estable = df.loc[idx_estable, "Nombre"]
+    atleta_variable = df.loc[idx_variable, "Nombre"]
 
-    st.write(f"🎯 Atleta más estable: **{atleta_estable}**")
-
-    st.write(f"🌪 Atleta más variable: **{atleta_variable}**")
+    st.write(f"🎯 Atleta más estable: **{atleta_estable}** (σ = {df_std.min():.2f})")
+    st.write(f"🌪 Atleta más variable: **{atleta_variable}** (σ = {df_std.max():.2f})")
 
     # Rey del podio
 
@@ -139,39 +148,25 @@ if nombre == "🏆 Salón de la Fama":
         st.write("💎 Consistencia perfecta:")
         st.write(", ".join(consistentes))
 
-    # Mayor activación histórica
+    # Activación histórica
 
     diffs = df[semanas].diff(axis=1)
 
     mayor_activacion = diffs.max().max()
-
     idx = diffs.stack().idxmax()
 
     atleta = df.loc[idx[0], "Nombre"]
+    semana = idx[1]
 
-    st.write(f"⚡ Mayor activación histórica: **{atleta}** (+{mayor_activacion} min)")
-
-    # Mayor bajón
+    st.write(f"⚡ Mayor activación histórica: **{atleta}** (+{mayor_activacion} min en {semana})")
 
     mayor_bajon = diffs.min().min()
-
     idx = diffs.stack().idxmin()
 
     atleta = df.loc[idx[0], "Nombre"]
+    semana = idx[1]
 
-    st.write(f"📉 Mayor bajón histórico: **{atleta}** ({mayor_bajon} min)")
-
-    # MVPs semanales
-
-    st.subheader("🥇 MVPs semanales")
-
-    for semana in semanas:
-
-        idx = df[semana].idxmax()
-
-        atleta = df.loc[idx, "Nombre"]
-
-        st.write(f"{semana} — {atleta}")
+    st.write(f"📉 Mayor bajón histórico: **{atleta}** ({mayor_bajon} min en {semana})")
 
 # =====================================================
 # PANEL INDIVIDUAL
@@ -197,20 +192,17 @@ if nombre and nombre != "🏆 Salón de la Fama":
     ranking_general = row["Ranking general"]
 
     ranking_m1 = row["Ranking Mens. 1"]
-
     ranking_m2 = row["Ranking Mens. 2"]
 
     st.header("📊 Estadísticas principales")
 
     st.write(f"🔥 Mejor semana: **{mejor} min ({semana_mejor})**")
-
     st.write(f"📊 Promedio semanal: **{promedio:.1f} min**")
-
     st.write(f"🎯 Desviación estándar: **{std:.2f}**")
-
     st.write(f"🌎 Contribución al total: **{contribucion:.2f}%**")
-
     st.write(f"🏆 Ranking general: **#{ranking_general}**")
+
+    # Cambio de ranking
 
     if ranking_m2 < ranking_m1:
         flecha = "⬆️"
@@ -220,39 +212,73 @@ if nombre and nombre != "🏆 Salón de la Fama":
         flecha = "➡️"
 
     st.write(f"Mes 1: **#{ranking_m1}**")
-
     st.write(f"Mes 2: **#{ranking_m2}** {flecha}")
 
-    # TROFEOS
-
-    st.header("🏅 Trofeos")
-
-    if mejor == df[semanas].max().max():
-        st.success("🏆 Récord histórico del reto")
-
-    semanas_mvp = []
-
-    for i, semana in enumerate(semanas):
-        if row[semana] == df[semana].max():
-            semanas_mvp.append(i + 1)
-
-    if semanas_mvp:
-        st.success(f"🥇 MVP en semanas {', '.join(map(str,semanas_mvp))}")
+    # Saltos personales
 
     diffs = minutos.diff()
 
     salto = diffs.max()
+    semana_salto = diffs.idxmax()
 
     bajon = diffs.min()
+    semana_bajon = diffs.idxmin()
 
-    st.write(f"⚡ Mayor salto de activación: **{salto} min**")
+    st.write(f"⚡ Mayor salto de activación: **{salto} min ({semana_salto})**")
+    st.write(f"📉 Mayor bajón: **{bajon} min ({semana_bajon})**")
 
-    st.write(f"📉 Mayor bajón: **{bajon} min**")
+    # -----------------------------------
+    # TROFEOS
+    # -----------------------------------
+
+    st.header("🏅 Trofeos")
+
+    mejor_global = df[semanas].max().max()
+
+    if mejor == mejor_global:
+        st.success(f"🏆 Mejor tiempo histórico ({mejor} min en {semana_mejor})")
+
+    mejor_mes1 = df[semanas[:4]].max().max()
+
+    if row[semanas[:4]].max() == mejor_mes1:
+        semana = row[semanas[:4]].idxmax()
+        st.success(f"🥇 Mejor tiempo Mes 1 ({row[semana]} min en {semana})")
+
+    mejor_mes2 = df[semanas[4:8]].max().max()
+
+    if row[semanas[4:8]].max() == mejor_mes2:
+        semana = row[semanas[4:8]].idxmax()
+        st.success(f"🥇 Mejor tiempo Mes 2 ({row[semana]} min en {semana})")
+
+    # Rey del podio
+
+    podios = (df[rank_semanas] == 1).sum(axis=1)
+
+    if nombre == df.loc[podios.idxmax(), "Nombre"]:
+        st.success(f"👑 Rey/Reina del podio ({podios.max()} semanas #1)")
+
+    # Tendencia positiva
+
+    tendencias = df[semanas].apply(tendencia_positiva, axis=1)
+
+    idx = tendencias.idxmax()
+
+    if nombre == df.loc[idx, "Nombre"]:
+        st.success(f"📈 Mayor tendencia positiva ({tendencias.max()} semanas seguidas subiendo)")
+
+    # Estabilidad
+
+    df_std = df[semanas].replace(0, np.nan).std(axis=1)
+
+    if nombre == df.loc[df_std.idxmin(), "Nombre"]:
+        st.success("🎯 Atleta más estable del reto")
+
+    # Consistencia perfecta
 
     if (minutos == 0).sum() == 0:
         st.success("💎 Consistencia perfecta")
 
-    # Gráfica individual
+   # Gráfica individual
     st.subheader("📊 Minutos por semana")
 
     fig, ax = plt.subplots()
@@ -264,6 +290,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
     ax.set_xlabel("Semana")
 
     st.pyplot(fig)
+
 # =================================================
 # GRÁFICAS GENERALES
 # =================================================
