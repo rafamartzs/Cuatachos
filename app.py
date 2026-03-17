@@ -268,12 +268,12 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
 # Ranking minutos mes 3
     st.subheader("📊 Ranking de minutos Mes 3")
-    df_mes3 = df[["Nombre"] + semana[9]].copy()
-    df_mes3["Total Mes3"] = df_mes3[semana[9]].sum(axis=1)
+    df_mes3 = df[["Nombre"] + semanas[9]].copy()
+    df_mes3["Total Mes3"] = df_mes3[semanas[9]].sum(axis=1)
     df_mes3_sorted = df_mes3.sort_values("Total Mes3", ascending=False)
     colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes3_sorted["Nombre"]]
     fig2, ax2 = plt.subplots(figsize=(10,5))
-    ax2.bar(df_mes2_sorted["Nombre"], df_mes3_sorted["Total Mes3"], color=colors)
+    ax2.bar(df_mes3_sorted["Nombre"], df_mes3_sorted["Total Mes3"], color=colors)
     ax2.set_ylabel("Minutos Mes 3")
     ax2.set_xlabel("Atletas")
     ax2.set_title("Ranking de minutos Mes 3")
