@@ -198,7 +198,10 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     promedio = minutos.mean()
 
-    std = minutos.std()
+    std = minutos.replace(0, np.nan).std()
+    # Mostrar mensaje si es menor a 100
+    if std < 100:
+        st.success("¡Felicidades! Eres de los atletas más estables")
 
     contribucion = minutos.sum() / total_minutos_global * 100
 
