@@ -199,10 +199,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
     promedio = minutos.mean()
 
     std = minutos.replace(0, np.nan).std()
-    # Mostrar mensaje si es menor a 100
-    if std < 100:
-        st.success("¡Felicidades! Eres de los atletas más estables")
-
+    
     contribucion = minutos.sum() / total_minutos_global * 100
 
     ranking_general = row["Ranking general"]
@@ -215,6 +212,9 @@ if nombre and nombre != "🏆 Salón de la Fama":
     st.write(f"🔥 Mejor semana: **{mejor} min ({semana_mejor})**")
     st.write(f"📊 Promedio semanal: **{promedio:.1f} min**")
     st.write(f"🎯 Desviación estándar: **{std:.2f}**")
+    # Mostrar mensaje si es menor a 100
+    if std < 100:
+        st.success("¡Felicidades! Eres de los atletas más estables")
     st.write(f"🌎 Contribución al total: **{contribucion:.2f}%**")
     st.write(f"🏆 Ranking general: **#{ranking_general}**")
 
