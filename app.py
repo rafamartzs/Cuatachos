@@ -3,288 +3,265 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# -------------------------------
-# Leer Excel
-# -------------------------------
+st.set_page_config(page_title="Cuatachos Wrapped", layout="wide")
+
+# -----------------------------------
+# Cargar datos
+# -----------------------------------
+
 df = pd.read_excel("reto_cuatachos.xlsx")
 
-# Columnas
-semanas = ["Semana 1","Semana 2","Semana 3","Semana 4",
-           "Semana 5","Semana 6","Semana 7","Semana 8"]
+semanas = [c for c in df.columns if "Semana" in c]
+rank_semanas = [c for c in df.columns if "Ranking " in c and "Mens" not in c and "general" not in c]
 
-rank_semanas = ["Ranking 1","Ranking 2","Ranking 3","Ranking 4",
-                "Ranking 5","Ranking 6","Ranking 7","Ranking 8"]
+ultima_semana = semanas[-1]
+semana_previa = semanas[-2]
 
-total_minutos = df[semanas].sum().sum()
+num_semana_actual = int(ultima_semana.split()[1])
 
-# -------------------------------
-# Premios automáticos
-# -------------------------------
+total_minutos_global = df[semanas].sum().sum()
 
-indice_estable = df[semanas].std(axis=1).idxmin()
-
-max_brincos = df[semanas].diff(axis=1).abs().max(axis=1)
-indice_brinco = max_brincos.idxmax()
-
-indice_dominante = df[semanas].sum(axis=1).idxmax()
-
-indice_consistente = (df[semanas]==0).sum(axis=1).idxmin()
-
-indice_rey_semanal = (df[rank_semanas]==1).sum(axis=1).idxmax()
-
-# -------------------------------
-# Ranking mejores tiempos
-# -------------------------------
-
-df["Mejor Semana Mes1"] = df[semanas[:4]].max(axis=1)
-df["Mejor Semana Mes2"] = df[semanas[4:]].max(axis=1)
-df["Mejor Semana General"] = df[semanas].max(axis=1)
-
-df["Rank Mejor Tiempo M1"] = df["Mejor Semana Mes1"].rank(method='min', ascending=False).astype(int)
-df["Rank Mejor Tiempo M2"] = df["Mejor Semana Mes2"].rank(method='min', ascending=False).astype(int)
-df["Rank Mejor Tiempo General"] = df["Mejor Semana General"].rank(method='min', ascending=False).astype(int)
-
-# -------------------------------
-# Título
-# -------------------------------
-
-st.title("🏃 Cuatachos Wrapped")
-st.write("¡Tu resumen del reto hasta el mes 2!")
-
-# -------------------------------
-# Selector con Salón de la Fama
-# -------------------------------
+# -----------------------------------
+# SELECTOR
+# -----------------------------------
 
 opciones = ["🏆 Salón de la Fama"] + df["Nombre"].tolist()
+
 nombre = st.selectbox("Selecciona tu nombre", opciones, index=None)
 
-# =================================================
+# =====================================================
 # SALÓN DE LA FAMA
-# =================================================
+# =====================================================
 
 if nombre == "🏆 Salón de la Fama":
 
-    st.header("🏆 Salón de la Fama del Reto Cuatachos")
+    st.title("🏆 Salón de la Fama del Reto")
 
-    # Récord absoluto
-    mejor_tiempo = df[semanas].max().max()
-    idx = df[semanas].max(axis=1).idxmax()
-    atleta_mejor = df.loc[idx,"Nombre"]
+    # -----------------------------------
+    # SEMANA RECIENTE
+    # -----------------------------------
 
-    st.subheader("🔥 Récord absoluto")
-    st.write(f"El mejor tiempo semanal es **{mejor_tiempo} minutos**, logrado por **{atleta_mejor}**")
+    st.header(f"🔥 Lo que pasó en la {ultima_semana}")
 
-    # Más estable
-    df["std_temp"] = df[semanas].std(axis=1)
-    atleta_estable = df.loc[df["std_temp"].idxmin(),"Nombre"]
+    atletas_moviendose = (df[ultima_semana] > 0).sum()
+
+    minutos_totales = df[ultima_semana].sum()
+
+    promedio = minutos_totales / atletas_moviendose if atletas_moviendose > 0 else 0
+
+    despertaron = df[(df[semana_previa] == 0) & (df[ultima_semana] > 0)]["Nombre"].tolist()
+
+    diff = df[ultima_semana] - df[semana_previa]
+
+    idx_activacion = diff.idxmax()
+    idx_relajaron = diff.idxmin()
+
+    atleta_activacion = df.loc[idx_activacion, "Nombre"]
+    atleta_relajado = df.loc[idx_relajaron, "Nombre"]
+
+    st.write(f"👟 Atletas moviéndose: **{atletas_moviendose}**")
+
+    st.write(f"⏱ Minutos totales: **{minutos_totales}**")
+
+    st.write(f"📊 Promedio entre atletas activos: **{promedio:.1f}**")
+
+    if despertaron:
+        st.write("🌅 Despertaron:")
+        st.write(", ".join(despertaron))
+
+    st.write(f"⚡ Mayor activación: **{atleta_activacion}** (+{diff.max()} min)")
+
+    st.write(f"😴 Mayor relajación: **{atleta_relajado}** ({diff.min()} min)")
+
+    st.subheader("🥇 Top 3 de la semana")
+
+    top3_semana = df.sort_values(ultima_semana, ascending=False).head(3)
+
+    for i, row in top3_semana.iterrows():
+        st.write(f"{row['Nombre']} — {row[ultima_semana]} min")
+
+    # -----------------------------------
+    # RECORDS HISTORICOS
+    # -----------------------------------
+
+    st.header("🏛️ Récords del reto")
+
+    # TOP 3 mejores semanas
+
+    records = []
+
+    for _, row in df.iterrows():
+        for semana in semanas:
+            records.append((row["Nombre"], semana, row[semana]))
+
+    records_df = pd.DataFrame(records, columns=["Nombre", "Semana", "Minutos"])
+
+    top3 = records_df.sort_values("Minutos", ascending=False).head(3)
+
+    st.subheader("🥇 Mejores semanas históricas")
+
+    for i, r in top3.iterrows():
+        st.write(f"{r['Nombre']} — {r['Semana']} — {r['Minutos']} min")
+
+    # Semana con más minutos
+
+    totales_semana = df[semanas].sum()
+
+    semana_record = totales_semana.idxmax()
+
+    st.write(f"📈 Semana con más minutos: **{semana_record}** ({totales_semana.max()} min)")
+
+    # Estabilidad (ignorando ceros)
+
+    df_std = df[semanas].replace(0, np.nan).std(axis=1)
+
+    atleta_estable = df.loc[df_std.idxmin(), "Nombre"]
+
+    atleta_variable = df.loc[df_std.idxmax(), "Nombre"]
 
     st.write(f"🎯 Atleta más estable: **{atleta_estable}**")
 
-    # Constancia perfecta
-    constantes = df[(df[semanas]==0).sum(axis=1)==0]["Nombre"].tolist()
+    st.write(f"🌪 Atleta más variable: **{atleta_variable}**")
 
-    if constantes:
-        st.write("💪 Atletas con consistencia perfecta:")
-        st.write(", ".join(constantes))
-    else:
-        st.write("Nadie ha logrado consistencia perfecta aún.")
+    # Rey del podio
 
-    # Rey/Reina del podio
-    df["num1_temp"] = (df[rank_semanas]==1).sum(axis=1)
+    podios = (df[rank_semanas] == 1).sum(axis=1)
 
-    idx = df["num1_temp"].idxmax()
+    atleta_podio = df.loc[podios.idxmax(), "Nombre"]
 
-    atleta_rey = df.loc[idx,"Nombre"]
-    semanas_num1 = df.loc[idx,"num1_temp"]
+    st.write(f"👑 Rey/Reina del podio: **{atleta_podio}** ({podios.max()} semanas #1)")
 
-    st.write(f"👑 Rey/Reina del podio: **{atleta_rey}** con **{semanas_num1} semanas en #1**")
+    # Consistencia perfecta
 
-    # MVP semanal
+    consistentes = df[(df[semanas] == 0).sum(axis=1) == 0]["Nombre"]
+
+    if len(consistentes) > 0:
+        st.write("💎 Consistencia perfecta:")
+        st.write(", ".join(consistentes))
+
+    # Mayor activación histórica
+
+    diffs = df[semanas].diff(axis=1)
+
+    mayor_activacion = diffs.max().max()
+
+    idx = diffs.stack().idxmax()
+
+    atleta = df.loc[idx[0], "Nombre"]
+
+    st.write(f"⚡ Mayor activación histórica: **{atleta}** (+{mayor_activacion} min)")
+
+    # Mayor bajón
+
+    mayor_bajon = diffs.min().min()
+
+    idx = diffs.stack().idxmin()
+
+    atleta = df.loc[idx[0], "Nombre"]
+
+    st.write(f"📉 Mayor bajón histórico: **{atleta}** ({mayor_bajon} min)")
+
+    # MVPs semanales
+
     st.subheader("🥇 MVPs semanales")
 
     for semana in semanas:
 
         idx = df[semana].idxmax()
-        atleta = df.loc[idx,"Nombre"]
-        tiempo = df.loc[idx,semana]
 
-        st.write(f"{semana}: **{atleta}** con {tiempo} minutos")
+        atleta = df.loc[idx, "Nombre"]
 
-    # Top 3 Mes 1
-    st.subheader("🏅 Top 3 Mes 1")
+        st.write(f"{semana} — {atleta}")
 
-    mes1 = df.copy()
-    mes1["total_temp"] = mes1[semanas[:4]].sum(axis=1)
-    top3 = mes1.sort_values("total_temp",ascending=False).head(3)
-
-    for i,row in top3.iterrows():
-        st.write(f"{row['Nombre']} — {row['total_temp']} minutos")
-
-    # Top 3 Mes 2
-    st.subheader("🏅 Top 3 Mes 2")
-
-    mes2 = df.copy()
-    mes2["total_temp"] = mes2[semanas[4:]].sum(axis=1)
-    top3 = mes2.sort_values("total_temp",ascending=False).head(3)
-
-    for i,row in top3.iterrows():
-        st.write(f"{row['Nombre']} — {row['total_temp']} minutos")
-
-    # Top 3 General
-    st.subheader("🏆 Top 3 General")
-
-    total = df.copy()
-    total["total_temp"] = total[semanas].sum(axis=1)
-    top3 = total.sort_values("total_temp",ascending=False).head(3)
-
-    for i,row in top3.iterrows():
-        st.write(f"{row['Nombre']} — {row['total_temp']} minutos")
-
-    # Mayor brinco
-    diffs = df[semanas].diff(axis=1)
-
-    mayor_brinco = diffs.max().max()
-    idx = diffs.stack().idxmax()
-
-    atleta = df.loc[idx[0],"Nombre"]
-
-    st.subheader("⚡ Mayor activación")
-    st.write(f"**{atleta}** con un salto de **{mayor_brinco} minutos** entre semanas consecutivas")
-
-    # Mayor bajón
-    mayor_bajon = diffs.min().min()
-    idx = diffs.stack().idxmin()
-
-    atleta = df.loc[idx[0],"Nombre"]
-
-    st.subheader("📉 Mayor bajón")
-    st.write(f"**{atleta}** con una caída de **{abs(mayor_bajon)} minutos** entre semanas consecutivas")
-
-# =================================================
+# =====================================================
 # PANEL INDIVIDUAL
-# =================================================
+# =====================================================
 
 if nombre and nombre != "🏆 Salón de la Fama":
 
     row = df[df["Nombre"] == nombre].iloc[0]
 
     minutos = row[semanas]
-    rankings = row[rank_semanas]
 
-    ranking_general = row["Ranking general"]
-    ranking_mes1 = row["Ranking Mens. 1"]
-    ranking_mes2 = row["Ranking Mens. 2"]
+    st.title(f"📊 Estadísticas de {nombre}")
 
-    mejor_tiempo = minutos.max()
+    mejor = minutos.max()
     semana_mejor = minutos.idxmax()
 
-    prom_general = minutos.mean()
+    promedio = minutos.mean()
 
-    desviacion = minutos.std()
+    std = minutos.std()
 
-    porcentaje_total = minutos.sum() / total_minutos * 100
+    contribucion = minutos.sum() / total_minutos_global * 100
 
-    semanas_cero = (minutos == 0).sum()
+    ranking_general = row["Ranking general"]
 
-    semanas_num1 = [i+1 for i,v in enumerate(rankings) if v==1]
+    ranking_m1 = row["Ranking Mens. 1"]
 
-    difs = minutos.diff().abs()
-    brinco_max = difs.max()
-    semana_brinco = difs.idxmax()
+    ranking_m2 = row["Ranking Mens. 2"]
 
-    # Mejor semana mes 1
-    mejor_tiempo_m1 = row[semanas[:4]].max()
-    semana_mejor_m1 = row[semanas[:4]].idxmax()
+    st.header("📊 Estadísticas principales")
 
-    # Mejor semana mes 2
-    mejor_tiempo_m2 = row[semanas[4:]].max()
-    semana_mejor_m2 = row[semanas[4:]].idxmax()
+    st.write(f"🔥 Mejor semana: **{mejor} min ({semana_mejor})**")
 
-    # Mejor semana general
-    mejor_tiempo_gen = row[semanas].max()
-    semana_mejor_gen = row[semanas].idxmax()
+    st.write(f"📊 Promedio semanal: **{promedio:.1f} min**")
 
-    st.header(f"¡Hola, {nombre}! 👋")
+    st.write(f"🎯 Desviación estándar: **{std:.2f}**")
 
-    st.subheader("🔥 Estadísticas principales")
+    st.write(f"🌎 Contribución al total: **{contribucion:.2f}%**")
 
-    st.write(f"Tu mejor tiempo en una semana: **{mejor_tiempo} minutos** ({semana_mejor})")
+    st.write(f"🏆 Ranking general: **#{ranking_general}**")
 
-    st.write(f"Tu promedio semanal: **{prom_general:.1f} minutos**")
-
-    st.write(f"Tu desviación estándar: **{desviacion:.2f}**")
-
-    st.write(f"Tu contribución al total: **{porcentaje_total:.2f}%**")
-
-    st.write(f"Tu posición en el ranking general: **#{ranking_general}**")
-
-    if ranking_mes2 < ranking_mes1:
+    if ranking_m2 < ranking_m1:
         flecha = "⬆️"
-    elif ranking_mes2 > ranking_mes1:
+    elif ranking_m2 > ranking_m1:
         flecha = "⬇️"
     else:
         flecha = "➡️"
 
-    st.write(f"Ranking mes 1: **#{ranking_mes1}**")
-    st.write(f"Ranking mes 2: **#{ranking_mes2}** {flecha}")
+    st.write(f"Mes 1: **#{ranking_m1}**")
 
-    if semanas_cero == 0:
-        st.success("🔥 ¡Ejercitaste todas las semanas!")
-    else:
-        st.warning(f"Tuviste {semanas_cero} semanas en 0, ¡pero sigue adelante!")
+    st.write(f"Mes 2: **#{ranking_m2}** {flecha}")
 
-    if semanas_num1:
-        st.success(f"🏆 Fuiste MVP en las semanas {', '.join(map(str,semanas_num1))}")
+    # TROFEOS
 
-    if desviacion < 100:
-        st.success("😎 ¡Eres de los atletas más estables!")
+    st.header("🏅 Trofeos")
 
-    st.info(f"⚡ Tu mayor salto fue de {brinco_max} minutos ({semana_brinco})")
+    if mejor == df[semanas].max().max():
+        st.success("🏆 Récord histórico del reto")
 
-    st.info(f"🥇 Tu mejor semana del mes 1: {semana_mejor_m1} con {mejor_tiempo_m1} minutos")
-    st.info(f"🥇 Tu mejor semana del mes 2: {semana_mejor_m2} con {mejor_tiempo_m2} minutos")
-    
-    # Gráfica individual
-    st.subheader("📊 Minutos por semana")
+    semanas_mvp = []
+
+    for i, semana in enumerate(semanas):
+        if row[semana] == df[semana].max():
+            semanas_mvp.append(i + 1)
+
+    if semanas_mvp:
+        st.success(f"🥇 MVP en semanas {', '.join(map(str,semanas_mvp))}")
+
+    diffs = minutos.diff()
+
+    salto = diffs.max()
+
+    bajon = diffs.min()
+
+    st.write(f"⚡ Mayor salto de activación: **{salto} min**")
+
+    st.write(f"📉 Mayor bajón: **{bajon} min**")
+
+    if (minutos == 0).sum() == 0:
+        st.success("💎 Consistencia perfecta")
+
+    # GRAFICA
+
+    st.header("📈 Progreso semanal")
 
     fig, ax = plt.subplots()
 
-    minutos.plot(kind="bar", ax=ax)
+    minutos.plot(kind="line", marker="o", ax=ax)
 
     ax.set_ylabel("Minutos")
 
     ax.set_xlabel("Semana")
 
     st.pyplot(fig)
-
-# =================================================
-# GRÁFICAS GENERALES
-# =================================================
-
-  # Ranking minutos mes 2
-    st.subheader("📊 Ranking de minutos Mes 2")
-    df_mes2 = df[["Nombre"] + semanas[4:8]].copy()
-    df_mes2["Total Mes2"] = df_mes2[semanas[4:8]].sum(axis=1)
-    df_mes2_sorted = df_mes2.sort_values("Total Mes2", ascending=False)
-    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes2_sorted["Nombre"]]
-    fig2, ax2 = plt.subplots(figsize=(10,5))
-    ax2.bar(df_mes2_sorted["Nombre"], df_mes2_sorted["Total Mes2"], color=colors)
-    ax2.set_ylabel("Minutos Mes 2")
-    ax2.set_xlabel("Atletas")
-    ax2.set_title("Ranking de minutos Mes 2")
-    plt.xticks(rotation=45, ha="right")
-    st.pyplot(fig2)
-
- # Ranking minutos totales
-    st.subheader("📊 Ranking de minutos Total General")
-    df_total = df[["Nombre"] + semanas].copy()
-    df_total["Total General"] = df_total[semanas].sum(axis=1)
-    df_total_sorted = df_total.sort_values("Total General", ascending=False)
-    colors_total = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_total_sorted["Nombre"]]
-    fig3, ax3 = plt.subplots(figsize=(10,5))
-    ax3.bar(df_total_sorted["Nombre"], df_total_sorted["Total General"], color=colors_total)
-    ax3.set_ylabel("Minutos Totales")
-    ax3.set_xlabel("Atletas")
-    ax3.set_title("Ranking de minutos Total General")
-    plt.xticks(rotation=45, ha="right")
-    st.pyplot(fig3)
