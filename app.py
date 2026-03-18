@@ -427,38 +427,6 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.pyplot(fig2)
 
-# -----------------------------------
-# HISTOGRAMA DE MINUTOS
-# -----------------------------------
-
-    st.subheader("📊 Distribución de minutos")
-
-    fig_hist, ax_hist = plt.subplots()
-
-    valores = minutos.replace(0, np.nan).dropna()
-
-    ax_hist.hist(valores)
-
-    ax_hist.set_xlabel("Minutos")
-    ax_hist.set_ylabel("Frecuencia")
-    ax_hist.set_title("Distribución de minutos por semana")
-
-    st.pyplot(fig_hist)
-
- # Ranking minutos totales
-    st.subheader("📊 Ranking de minutos Total General")
-    df_total = df[["Nombre"] + semanas].copy()
-    df_total["Total General"] = df_total[semanas].sum(axis=1)
-    df_total_sorted = df_total.sort_values("Total General", ascending=False)
-    colors_total = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_total_sorted["Nombre"]]
-    fig3, ax3 = plt.subplots(figsize=(10,5))
-    ax3.bar(df_total_sorted["Nombre"], df_total_sorted["Total General"], color=colors_total)
-    ax3.set_ylabel("Minutos Totales")
-    ax3.set_xlabel("Atletas")
-    ax3.set_title("Ranking de minutos Total General")
-    plt.xticks(rotation=45, ha="right")
-    st.pyplot(fig3)
-
  # =================================================
  # GRÁFICA DE EVOLUCIÓN DEL RANKING SEMANAL
  # =================================================
@@ -488,41 +456,3 @@ if nombre and nombre != "🏆 Salón de la Fama":
     plt.xticks(rotation=45)
     st.pyplot(fig4)
 
-# =================================================
-# EVOLUCIÓN DEL RANKING GENERAL (ACUMULADO)
-# =================================================
-
-    st.subheader("🏁 Evolución del ranking general (acumulado)")
-
-# Construir acumulados semana a semana
-    df_acum = df[["Nombre"] + semanas].copy()
-
-    for i, semana in enumerate(semanas):
-        if i == 0:
-            df_acum[semana] = df[semana]
-        else:
-            df_acum[semana] = df_acum[semanas[:i+1]].sum(axis=1)
-
-# Calcular ranking por semana
-    ranking_acum = pd.DataFrame()
-    ranking_acum["Nombre"] = df["Nombre"]
-
-    for semana in semanas:
-        ranking_acum[semana] = df_acum[semana].rank(ascending=False, method="min")
-
-# Plot
-    fig_rank, ax_rank = plt.subplots(figsize=(12,6))
-
-    for i, row in ranking_acum.iterrows():
-        if row["Nombre"] == nombre:
-            ax_rank.plot(semanas, row[semanas], marker='o', linewidth=3)
-        else:
-            ax_rank.plot(semanas, row[semanas], marker='o', linewidth=1, alpha=0.4)
-
-    ax_rank.invert_yaxis()
-    ax_rank.set_xlabel("Semanas")
-    ax_rank.set_ylabel("Ranking acumulado")
-    ax_rank.set_title("Carrera por el ranking general")
-
-    plt.xticks(rotation=45)
-    st.pyplot(fig_rank)
