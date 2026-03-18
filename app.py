@@ -265,7 +265,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
         st.success(f"🏆 ¡Ya superaste los 1000 min! (+{abs(faltante):.0f})")
 
 # -----------------------------------
-# PREDICCIÓN FUTURA (REGRESIÓN)
+# PREDICCIÓN FUTURA (REGRESIÓN SEGURA)
 # -----------------------------------
 
     st.subheader("🔮 Predicción semanas 10–12 (regresión)")
@@ -273,34 +273,42 @@ if nombre and nombre != "🏆 Salón de la Fama":
 # Tomar últimas 4 semanas
     ultimas_4 = minutos[-4:]
 
-# Convertir semanas a números (ej: "Semana 6" → 6)
-    x = [int(s.split()[1]) for s in ultimas_4.index]
-    y = ultimas_4.values
+# Convertir a numérico (forzando limpieza)
+    y = pd.to_numeric(ultimas_4.values, errors='coerce')
 
-# Ajustar regresión lineal
-    coef = np.polyfit(x, y, 1)  # grado 1 = línea
-    m, b = coef
+# Convertir semanas a números
+    x = np.array([int(s.split()[1]) for s in ultimas_4.index], dtype=float)
 
-# Semanas futuras
-    semanas_futuras = [x[-1] + 1, x[-1] + 2, x[-1] + 3]
+# Eliminar NaNs (por si había basura)
+    mask = ~np.isnan(y)
+    x = x[mask]
+    y = y[mask]
 
-    predicciones = {}
+# Validar que haya suficientes datos
+    if len(x) >= 2:
 
-    for s in semanas_futuras:
-        pred = m * s + b
-        pred = max(pred, 0)  # evitar negativos
-        predicciones[f"Semana {s}"] = pred
+        coef = np.polyfit(x, y, 1)
+        m, b = coef
 
-# Mostrar predicciones
-    for semana, valor in predicciones.items():
-       st.write(f"{semana}: **{valor:.1f} min**")
+        semanas_futuras = [x[-1] + 1, x[-1] + 2, x[-1] + 3]
 
-# Total proyectado
-    total_estimado = minutos.sum() + sum(predicciones.values())
+        predicciones = {}
 
-    st.write(f"🏁 Total proyectado: **{total_estimado:.0f} min**")
+        for s in semanas_futuras:
+            pred = m * s + b
+            pred = max(pred, 0)
+            predicciones[f"Semana {int(s)}"] = pred
 
-    # -----------------------------------
+        for semana, valor in predicciones.items():
+            st.write(f"{semana}: **{valor:.1f} min**")
+
+        total_estimado = minutos.sum() + sum(predicciones.values())
+        st.write(f"🏁 Total proyectado: **{total_estimado:.0f} min**")
+
+        st.caption(f"Modelo: y = {m:.2f}x + {b:.2f}")
+
+    else:
+        st.warning("⚠️ No hay suficientes datos válidos para hacer predicción")    # -----------------------------------
     # TROFEOS
     # -----------------------------------
     
