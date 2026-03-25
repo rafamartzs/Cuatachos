@@ -122,7 +122,7 @@ if nombre == "🏆 Salón de la Fama":
 
     idx = tendencias_final.idxmax()
     if tendencias_final.max() > 0:
-        st.success(f"🏅 Golden Trend Athlete: **{df.loc[idx, 'Nombre']}** ({tendencias_final.max()} semanas con tendencia positiva)")
+        st.write(f"🏅 Golden Trend Athlete: **{df.loc[idx, 'Nombre']}** ({tendencias_final.max()} semanas con tendencia positiva)")
 
     # -----------------------------------
     # RÉCORDS HISTÓRICOS
