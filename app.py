@@ -411,7 +411,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     semanas_mes3 = semanas[-2]
 
-    df_mes3 = df[["Nombre" + semanas_mes3].copy()
+    df_mes3 = df[["Nombre"] + semanas_mes3].copy()
 
     df_mes3["Total Mes3"] = df_mes3[semanas_mes3].sum(axis=1)
 
