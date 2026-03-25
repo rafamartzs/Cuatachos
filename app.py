@@ -210,8 +210,8 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     ranking_general = row["Ranking general"]
 
-    ranking_m1 = row["Ranking Mens. 1"]
     ranking_m2 = row["Ranking Mens. 2"]
+    ranking_m3 = row["Ranking Mens. 3"]
 
     st.header("📊 Estadísticas principales")
 
@@ -226,15 +226,15 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     # Cambio de ranking
 
-    if ranking_m2 < ranking_m1:
+    if ranking_m3 < ranking_m2:
         flecha = "⬆️"
-    elif ranking_m2 > ranking_m1:
+    elif ranking_m3 > ranking_m2:
         flecha = "⬇️"
     else:
         flecha = "➡️"
 
-    st.write(f"Mes 1: **#{ranking_m1}**")
-    st.write(f"Mes 2: **#{ranking_m2}** {flecha}")
+    st.write(f"Mes 2: **#{ranking_m2}**")
+    st.write(f"Mes 3 (to date): **#{ranking_m3}** {flecha}")
 
     # Saltos personales
 
@@ -255,7 +255,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     meta = 1000
 
-    minutos_actuales = row[ultima_semana]
+    minutos_actuales = row[semanas[-2:]].sum()
 
     faltante = meta - minutos_actuales
 
@@ -290,7 +290,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
         coef = np.polyfit(x, y, 1)
         m, b = coef
 
-        semanas_futuras = [x[-1] + 1, x[-1] + 2, x[-1] + 3]
+        semanas_futuras = [x[-1] + 1, x[-1] + 2]
 
         predicciones = {}
 
@@ -331,6 +331,12 @@ if nombre and nombre != "🏆 Salón de la Fama":
     if row[semanas[4:8]].max() == mejor_mes2:
         semana = row[semanas[4:8]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 2 ({row[semana]} min en {semana})")
+
+    mejor_mes3 = df[semanas[9:10]].max().max()
+
+    if row[semanas[9:10]].max() == mejor_mes3:
+        semana = row[semanas[9:10]].idxmax()
+        st.success(f"🥇 Mejor tiempo Mes 3 ({row[semana]} min en {semana})")
 
     # Rey del podio
 
