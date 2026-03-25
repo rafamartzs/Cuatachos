@@ -98,6 +98,16 @@ if nombre == "🏆 Salón de la Fama":
     for _, row in top3_semana.iterrows():
         st.write(f"{row['Nombre']} — {row[ultima_semana]} min")
 
+#-----
+#Tendencia positiva
+# Calcular tendencias positivas hasta la última semana
+    tendencias_final = df[semanas].apply(tendencia_positiva_hasta_final, axis=1)
+
+# Identificar al atleta con la mayor tendencia positiva que llegó hasta la última semana
+    idx = tendencias_final.idxmax()
+    if tendencias_final.max() > 0:
+        st.success(f"🏅 Golden Trend Athlete: **{df.loc[idx, 'Nombre']}** ({tendencias_final.max()}     semanas con tendencia positiva)")
+
     # -----------------------------------
     # RÉCORDS HISTÓRICOS
     # -----------------------------------
