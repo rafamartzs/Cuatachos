@@ -409,11 +409,11 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.subheader("📊 Ranking de minutos Mes 3")
 
-    ultima_semana = row[semanas[-2:]].sum()
+    semanas_mes3 = semanas[-2]
 
-    df_mes3 = df[["Nombre", ultima_semana]].copy()
+    df_mes3 = df[["Nombre" + semanas_mes3].copy()
 
-    df_mes3["Total Mes3"] = df_mes3[ultima_semana]
+    df_mes3["Total Mes3"] = df_mes3[semanas_mes3].sum(axis=1)
 
     df_mes3_sorted = df_mes3.sort_values("Total Mes3", ascending=False)
 
