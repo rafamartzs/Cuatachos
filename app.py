@@ -65,6 +65,8 @@ if nombre == "🏆 Salón de la Fama":
     promedio = minutos_totales / atletas_moviendose if atletas_moviendose > 0 else 0
 
     despertaron = df[(df[semana_previa] == 0) & (df[ultima_semana] > 0)]["Nombre"].tolist()
+    
+    durmieron = df[(df[semana_previa] > 0) & (df[ultima_semana] == 0)]["Nombre"].tolist()
 
     diff = df[ultima_semana] - df[semana_previa]
 
@@ -81,6 +83,10 @@ if nombre == "🏆 Salón de la Fama":
     if despertaron:
         st.write("🌅 Despertaron:")
         st.write(", ".join(despertaron))
+
+    if durmieron:
+        st.write("😴 Se durmieron:")
+        st.write(", ".join(durmieron))
 
     st.write(f"⚡ Mayor activación: **{atleta_activacion}** (+{diff.max()} min)")
     st.write(f"😴 Mayor relajación: **{atleta_relajado}** ({diff.min()} min)")
