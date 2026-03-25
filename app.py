@@ -101,12 +101,28 @@ if nombre == "🏆 Salón de la Fama":
 #-----
 #Tendencia positiva
 # Calcular tendencias positivas hasta la última semana
+    def tendencia_positiva_hasta_final(serie):
+    # Asegurarnos de que todos los valores sean numéricos
+        serie = pd.to_numeric(serie, errors='coerce').fillna(0)
+    
+        count = 0  # contador de racha actual
+        for i in range(1, len(serie)):
+            if serie[i] > serie[i-1] and serie[i] != 0:
+                count += 1
+            else:
+                count = 0  # se rompe la tendencia si baja o es 0
+    
+    # Solo devolvemos la racha si la última semana mantiene tendencia positiva
+        if serie.iloc[-1] > serie.iloc[-2] and serie.iloc[-1] != 0:
+            return count + 1  # sumamos 1 para incluir la primera semana de la racha
+        else:
+            return 0
+
     tendencias_final = df[semanas].apply(tendencia_positiva_hasta_final, axis=1)
 
-# Identificar al atleta con la mayor tendencia positiva que llegó hasta la última semana
     idx = tendencias_final.idxmax()
     if tendencias_final.max() > 0:
-        st.success(f"🏅 Golden Trend Athlete: **{df.loc[idx, 'Nombre']}** ({tendencias_final.max()}     semanas con tendencia positiva)")
+        st.success(f"🏅 Golden Trend Athlete: **{df.loc[idx, 'Nombre']}** ({tendencias_final.max()} semanas con tendencia positiva)")
 
     # -----------------------------------
     # RÉCORDS HISTÓRICOS
