@@ -409,7 +409,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.subheader("📊 Ranking de minutos Mes 3")
 
-    semanas_mes3 = semanas[-2]
+    semanas_mes3 = semanas[-2:]
 
     df_mes3 = df[["Nombre"] + semanas_mes3].copy()
 
