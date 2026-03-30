@@ -219,6 +219,18 @@ if nombre == "🏆 Salón de la Fama":
 
     st.bar_chart(df_genero)
 
+    st.subheader("👶 Análisis por edades")
+
+    df_edades = df.groupby("Edades")[semanas].sum().sum(axis=1)
+
+    st.bar_chart(df_edades)
+
+    st.subheader("🌎 Análisis por regiones")
+
+    df_regiones = df.groupby("Regiones")[semanas].sum().sum(axis=1)
+
+    st.bar_chart(df_regiones)
+
 # =====================================================
 # PANEL INDIVIDUAL
 # =====================================================
