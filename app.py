@@ -98,32 +98,39 @@ if nombre == "🏆 Salón de la Fama":
     for _, row in top3_semana.iterrows():
         st.write(f"{row['Nombre']} — {row[ultima_semana]} min")
 
-#-----
-#Tendencia positiva
-# Calcular tendencias positivas hasta la última semana
+# -----------------------------------
+# Tendencia positiva
+# -----------------------------------
+
     def tendencia_positiva_hasta_final(serie):
-    # Asegurarnos de que todos los valores sean numéricos
         serie = pd.to_numeric(serie, errors='coerce').fillna(0)
     
-        count = 0  # contador de racha actual
+        count = 0
         for i in range(1, len(serie)):
             if serie[i] > serie[i-1] and serie[i] != 0:
                 count += 1
             else:
-                count = 0  # se rompe la tendencia si baja o es 0
+                count = 0
     
-    # Solo devolvemos la racha si la última semana mantiene tendencia positiva
         if serie.iloc[-1] > serie.iloc[-2] and serie.iloc[-1] != 0:
-            return count + 1  # sumamos 1 para incluir la primera semana de la racha
+            return count + 1
         else:
             return 0
 
+# Calcular tendencias
     tendencias_final = df[semanas].apply(tendencia_positiva_hasta_final, axis=1)
 
-    idx = tendencias_final.idxmax()
-    if tendencias_final.max() > 0:
-        st.write(f"🏅 Golden Trend Athlete: **{df.loc[idx, 'Nombre']}** ({tendencias_final.max()} semanas con tendencia positiva)")
+    max_tendencia = tendencias_final.max()
 
+    if max_tendencia > 0:
+        ganadores = df.loc[tendencias_final == max_tendencia, "Nombre"].tolist()
+    
+        nombres = ", ".join(ganadores)
+    
+        if len(ganadores) == 1:
+            st.write(f"🏅 Golden Trend Athlete: **{nombres}** ({max_tendencia} semanas con tendencia positiva)")
+        else:
+            st.write(f"🏅 Golden Trend Athletes: **{nombres}** ({max_tendencia} semanas con tendencia positiva)")
     # -----------------------------------
     # RÉCORDS HISTÓRICOS
     # -----------------------------------
@@ -164,14 +171,20 @@ if nombre == "🏆 Salón de la Fama":
     st.write(f"🎯 Atleta más estable: **{atleta_estable}** (σ = {df_std.min():.2f})")
     st.write(f"🌪 Atleta más variable: **{atleta_variable}** (σ = {df_std.max():.2f})")
 
-    # Rey del podio
+ # Rey/Reina del podio (con empates)
 
     podios = (df[rank_semanas] == 1).sum(axis=1)
 
-    atleta_podio = df.loc[podios.idxmax(), "Nombre"]
+    max_podios = podios.max()
 
-    st.write(f"👑 Rey/Reina del podio: **{atleta_podio}** ({podios.max()} semanas #1)")
+    ganadores = df.loc[podios == max_podios, "Nombre"].tolist()
 
+    nombres = ", ".join(ganadores)
+
+    if len(ganadores) == 1:
+        st.write(f"👑 Rey/Reina del podio: **{nombres}** ({max_podios} semanas #1)")
+    else:
+        st.write(f"👑 Reinas/Reyes del podio: **{nombres}** ({max_podios} semanas #1)")
     # Consistencia perfecta
 
     consistentes = df[(df[semanas] == 0).sum(axis=1) == 0]["Nombre"]
@@ -299,7 +312,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     meta = 1000
 
-    minutos_actuales = row[semanas[-2:]].sum()
+    minutos_actuales = row[semanas[-3:]].sum()
 
     faltante = meta - minutos_actuales
 
@@ -312,7 +325,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 # PREDICCIÓN FUTURA (REGRESIÓN SEGURA)
 # -----------------------------------
 
-    st.subheader("🔮 Predicción semanas 10–12 (regresión)")
+    st.subheader("🔮 Predicción semana 12")
 
 # Tomar últimas 4 semanas
     ultimas_4 = minutos[-4:]
@@ -334,7 +347,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
         coef = np.polyfit(x, y, 1)
         m, b = coef
 
-        semanas_futuras = [x[-1] + 1, x[-1] + 2]
+        semanas_futuras = [x[-1] + 1]
 
         predicciones = {}
 
@@ -453,7 +466,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.subheader("📊 Ranking de minutos Mes 3")
 
-    semanas_mes3 = semanas[-2:]
+    semanas_mes3 = semanas[-3:]
 
     df_mes3 = df[["Nombre"] + semanas_mes3].copy()
 
