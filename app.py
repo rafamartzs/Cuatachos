@@ -269,13 +269,13 @@ if nombre == "🏆 Salón de la Fama":
 
     st.subheader("Promedio por edades")
 
-    df_edades = df.groupby("Edades")[semanas].sum().mean(axis=1).sort_values(ascending=False)
+    df_edades = df.groupby("Edades")[Total].mean.sort_values(ascending=False)
 
     st.bar_chart(df_edades)
 
     st.subheader("Promedio por regiones")
 
-    df_regiones = df.groupby("Regiones")[semanas].sum().mean(axis=1).sort_values(ascending=False)
+    df_regiones = df.groupby("Regiones")[Total].mean.sort_values(ascending=False)
 
     st.bar_chart(df_regiones)
 
