@@ -153,14 +153,14 @@ if nombre == "🏆 Salón de la Fama":
 
 # 👇 AQUÍ está la magia (condición AND)
     for i in df.index[
-    (totales_mes1 >= 1000) &
-    (totales_mes2 >= 1000) &
-    (totales_mes3 >= 1000)
+        (totales_mes1 >= 1000) &
+        (totales_mes2 >= 1000) &
+        (totales_mes3 >= 1000)
     ]:
-    st.success(
-        f"🏆 {df.loc[i, 'Nombre']} "
-        f"(M1: {totales_mes1[i]} | M2: {totales_mes2[i]} | M3: {totales_mes3[i]})"
-    )
+        st.success(
+            f"🏆 {df.loc[i, 'Nombre']} "
+            f"(M1: {totales_mes1[i]} | M2: {totales_mes2[i]} | M3: {totales_mes3[i]})"
+        )
 
     st.header("🏛️ Récords del reto")
 
