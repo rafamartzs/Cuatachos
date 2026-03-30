@@ -152,18 +152,15 @@ if nombre == "🏆 Salón de la Fama":
     totales_mes3 = df[semanas_mes3].sum(axis=1)
 
 # 👇 AQUÍ está la magia (condición AND)
-    cumplieron_todo = df[
-        (totales_mes1 >= 1000) &
-        (totales_mes2 >= 1000) &
-        (totales_mes3 >= 1000)
-    ]["Nombre"].tolist()
-
-# Mostrar resultados
-    if cumplieron_todo:
-        for atleta in cumplieron_todo:
-            st.success(f"🏆 {atleta}")
-    else:
-        st.write("Aún nadie ha completado los 3 meses del reto 😏")
+    for i in df.index[
+    (totales_mes1 >= 1000) &
+    (totales_mes2 >= 1000) &
+    (totales_mes3 >= 1000)
+    ]:
+    st.success(
+        f"🏆 {df.loc[i, 'Nombre']} "
+        f"(M1: {totales_mes1[i]} | M2: {totales_mes2[i]} | M3: {totales_mes3[i]})"
+    )
 
     st.header("🏛️ Récords del reto")
 
@@ -395,7 +392,9 @@ if nombre and nombre != "🏆 Salón de la Fama":
         st.caption(f"Modelo: y = {m:.2f}x + {b:.2f}")
 
     else:
-        st.warning("⚠️ No hay suficientes datos válidos para hacer predicción")    # -----------------------------------
+        st.warning("⚠️ No hay suficientes datos válidos para hacer predicción")    
+
+    # -----------------------------------
     # TROFEOS
     # -----------------------------------
     
@@ -419,7 +418,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
         semana = row[semanas[4:8]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 2 ({row[semana]} min en {semana})")
 
-    mejor_mes3 = df[semanas[9:10]].max().max()
+    mejor_mes3 = df[semanas[9:11]].max().max()
 
     if row[semanas[9:10]].max() == mejor_mes3:
         semana = row[semanas[9:10]].idxmax()
