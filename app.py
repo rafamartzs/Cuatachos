@@ -174,7 +174,7 @@ if nombre == "🏆 Salón de la Fama":
 
     top3 = records_df.sort_values("Minutos", ascending=False).head(3)
 
-    st.subheader("🥇 Mejores semanas históricas")
+    st.subheader("🥇 Mejores tiempos históricos")
 
     for _, r in top3.iterrows():
         st.write(f"{r['Nombre']} — {r['Semana']} — {r['Minutos']} min")
@@ -187,16 +187,24 @@ if nombre == "🏆 Salón de la Fama":
 
     # Estabilidad
 
-    df_std = df[semanas].replace(0, np.nan).std(axis=1)
+    # Contar semanas en 0
+    semanas_cero = (df[semanas] == 0).sum(axis=1)
+
+# Filtrar atletas con menos de 2 semanas en 0
+    df_filtrado = df[semanas_cero < 2].copy()
+
+# Calcular desviación estándar ignorando ceros
+    df_std = df_filtrado[semanas].replace(0, np.nan).std(axis=1)
 
     idx_estable = df_std.idxmin()
     idx_variable = df_std.idxmax()
 
-    atleta_estable = df.loc[idx_estable, "Nombre"]
-    atleta_variable = df.loc[idx_variable, "Nombre"]
+    atleta_estable = df_filtrado.loc[idx_estable, "Nombre"]
+    atleta_variable = df_filtrado.loc[idx_variable, "Nombre"]
 
     st.write(f"🎯 Atleta más estable: **{atleta_estable}** (σ = {df_std.min():.2f})")
     st.write(f"🌪 Atleta más variable: **{atleta_variable}** (σ = {df_std.max():.2f})")
+
 
  # Rey/Reina del podio (con empates)
 
@@ -294,6 +302,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     ranking_general = row["Ranking general"]
 
+    ranking_m1 = row["Ranking Mens. 1"]
     ranking_m2 = row["Ranking Mens. 2"]
     ranking_m3 = row["Ranking Mens. 3"]
 
@@ -317,6 +326,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
     else:
         flecha = "➡️"
 
+    st.write(f"Mes 1: **#{ranking_m1}**")
     st.write(f"Mes 2: **#{ranking_m2}**")
     st.write(f"Mes 3 (to date): **#{ranking_m3}** {flecha}")
 
@@ -458,12 +468,19 @@ if nombre and nombre != "🏆 Salón de la Fama":
     if nombre == atleta_salto:
         st.success(f"⚡ Mayor salto de activación histórico (+{mayor_salto} min en {semana_salto})")
 
-    # Estabilidad
+    # Estabilidad (solo atletas con menos de 2 semanas en 0)
 
-    df_std = df[semanas].replace(0, np.nan).std(axis=1)
+    semanas_cero = (df[semanas] == 0).sum(axis=1)
 
-    if nombre == df.loc[df_std.idxmin(), "Nombre"]:
-        st.success("🎯 Atleta más estable del reto")
+    df_filtrado = df[semanas_cero < 2].copy()
+
+    if not df_filtrado.empty:
+        df_std = df_filtrado[semanas].replace(0, np.nan).std(axis=1)
+
+        idx_estable = df_std.idxmin()
+
+        if nombre == df_filtrado.loc[idx_estable, "Nombre"]:
+            st.success(f"🎯 Atleta más estable del reto (σ = {df_std.min():.2f})")
 
     # Consistencia perfecta
 
