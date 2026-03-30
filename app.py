@@ -261,15 +261,15 @@ if nombre == "🏆 Salón de la Fama":
 
         st.write(f"{semana} — {atleta} ({minutos} min)")
 
-    st.subheader("👥 Análisis por género")
+    st.subheader("👥 Minutos por género")
 
     df_genero = df.groupby("Sexo")[semanas].sum().sum(axis=1)
 
     st.bar_chart(df_genero)
 
-    st.subheader("👶 Análisis por edades")
+    st.subheader("👶 Promedio de minutos por rango edades")
 
-    df_edades = df.groupby("Edades")[semanas].sum().sum(axis=1)
+    df_edades = df.groupby("Edades")[semanas].sum().mean(axis=1)
 
     st.bar_chart(df_edades)
 
