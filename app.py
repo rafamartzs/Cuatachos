@@ -261,21 +261,21 @@ if nombre == "🏆 Salón de la Fama":
 
         st.write(f"{semana} — {atleta} ({minutos} min)")
 
-    st.subheader("👥 Minutos por género")
+    st.subheader("Minutos por género")
 
     df_genero = df.groupby("Sexo")[semanas].sum().sum(axis=1)
 
     st.bar_chart(df_genero)
 
-    st.subheader("👶 Promedio de minutos por rango edades")
+    st.subheader("Promedio por edades")
 
-    df_edades = df.groupby("Edades")[semanas].sum().mean(axis=1)
+    df_edades = df.groupby("Edades")[semanas].mean().mean(axis=1).sort_values(ascending=False)
 
     st.bar_chart(df_edades)
 
-    st.subheader("🌎 Análisis por regiones")
+    st.subheader("Promedio por regiones")
 
-    df_regiones = df.groupby("Regiones")[semanas].sum().sum(axis=1)
+    df_regiones = df.groupby("Regiones")[semanas].mean().mean(axis=1).sort_values(ascending=False)
 
     st.bar_chart(df_regiones)
 
