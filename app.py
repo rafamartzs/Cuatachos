@@ -135,6 +135,36 @@ if nombre == "🏆 Salón de la Fama":
     # RÉCORDS HISTÓRICOS
     # -----------------------------------
 
+# -----------------------------------
+# ATLETAS QUE CUMPLIERON LOS 3 MESES
+# -----------------------------------
+
+    st.subheader("🏆 Atletas que han cumplido el reto completo (3/3 meses)")
+
+# Definir semanas por mes
+    semanas_mes1 = semanas[0:4]
+    semanas_mes2 = semanas[4:8]
+    semanas_mes3 = semanas[8:]  # dinámico (hasta la semana actual)
+
+# Sumas por mes
+    totales_mes1 = df[semanas_mes1].sum(axis=1)
+    totales_mes2 = df[semanas_mes2].sum(axis=1)
+    totales_mes3 = df[semanas_mes3].sum(axis=1)
+
+# 👇 AQUÍ está la magia (condición AND)
+    cumplieron_todo = df[
+        (totales_mes1 >= 1000) &
+        (totales_mes2 >= 1000) &
+        (totales_mes3 >= 1000)
+    ]["Nombre"].tolist()
+
+# Mostrar resultados
+    if cumplieron_todo:
+        for atleta in cumplieron_todo:
+            st.success(f"🏆 {atleta}")
+    else:
+        st.write("Aún nadie ha completado los 3 meses del reto 😏")
+
     st.header("🏛️ Récords del reto")
 
     records = []
@@ -395,12 +425,16 @@ if nombre and nombre != "🏆 Salón de la Fama":
         semana = row[semanas[9:10]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 3 ({row[semana]} min en {semana})")
 
-    # Rey del podio
+    # Rey/Reina del podio (con empates)
 
     podios = (df[rank_semanas] == 1).sum(axis=1)
 
-    if nombre == df.loc[podios.idxmax(), "Nombre"]:
-        st.success(f"👑 Rey/Reina del podio ({podios.max()} semanas #1)")
+    max_podios = podios.max()
+
+    ganadores_podio = df.loc[podios == max_podios, "Nombre"].tolist()
+
+    if nombre in ganadores_podio:
+        st.success(f"👑 Rey/Reina del podio ({max_podios} semanas #1)")
 
     # Tendencia positiva
 
