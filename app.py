@@ -194,6 +194,7 @@ if nombre == "🏆 Salón de la Fama":
     st.write(f"Atletas que fueron mordidos por un perro")
     st.sucess(
         f"Miriam Sarreón"
+    )
 
     st.write(f"📈 Semana con más minutos: **{semana_record}** ({totales_semana.max()} min)")
 
