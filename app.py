@@ -103,19 +103,22 @@ if nombre == "🏆 Salón de la Fama":
 # -----------------------------------
 
     def tendencia_positiva_hasta_final(serie):
-        serie = pd.to_numeric(serie, errors='coerce').fillna(0)
-    
-        count = 0
-        for i in range(1, len(serie)):
-            if serie[i] > serie[i-1] and serie[i] != 0:
-                count += 1
-            else:
-                count = 0
-    
-        if serie.iloc[-1] > serie.iloc[-2] and serie.iloc[-1] != 0:
-            return count + 1
+    # Convertir a numérico y conservar los 0 como cortadores de tendencia
+    serie = pd.to_numeric(serie, errors="coerce").fillna(0)
+
+    count = 0
+
+    for i in range(1, len(serie)):
+        if serie.iloc[i] > serie.iloc[i - 1] and serie.iloc[i] != 0:
+            count += 1
         else:
-            return 0
+            count = 0
+
+    # Solo cuenta si la tendencia positiva llega hasta la última semana
+    if len(serie) >= 2 and serie.iloc[-1] > serie.iloc[-2] and serie.iloc[-1] != 0:
+        return count + 1
+    else:
+        return 0
 
 # Calcular tendencias
     tendencias_final = df[semanas].apply(tendencia_positiva_hasta_final, axis=1)
