@@ -142,7 +142,7 @@ if nombre == "🏆 Salón de la Fama":
 # ATLETAS QUE CUMPLIERON LOS 3 MESES
 # -----------------------------------
 
-    st.subheader("🏆 Atletas que han cumplido el reto completo (3/3 meses)")
+    st.subheader("🏆 Atletas que cumplieron el reto completo (3/3 meses)")
 
 # Definir semanas por mes
     semanas_mes1 = semanas[0:4]
@@ -185,6 +185,15 @@ if nombre == "🏆 Salón de la Fama":
     totales_semana = df[semanas].sum()
 
     semana_record = totales_semana.idxmax()
+    st.write(f"Atletas que han logrado 1000 minutos más rápido")
+    st.sucess(
+        f"Gaby Rodríguez (Semanas 5 y 6)"
+        f"Miriam Sarreón (Semanas 5 y 6)"
+        f"Romario Velázquez (Semanas 9 y 10)"
+    )
+    st.write(f"Atletas que fueron mordidos por un perro")
+    st.sucess(
+        f"Miriam Sarreón"
 
     st.write(f"📈 Semana con más minutos: **{semana_record}** ({totales_semana.max()} min)")
 
@@ -220,9 +229,9 @@ if nombre == "🏆 Salón de la Fama":
     nombres = ", ".join(ganadores)
 
     if len(ganadores) == 1:
-        st.write(f"👑 Rey/Reina del podio: **{nombres}** ({max_podios} semanas #1)")
+        st.write(f"👑 Monarca del podio: **{nombres}** ({max_podios} semanas #1)")
     else:
-        st.write(f"👑 Reinas/Reyes del podio: **{nombres}** ({max_podios} semanas #1)")
+        st.write(f"👑 Monarcas del podio: **{nombres}** ({max_podios} semanas #1)")
     # Consistencia perfecta
 
     consistentes = df[(df[semanas] == 0).sum(axis=1) == 0]["Nombre"]
@@ -352,60 +361,14 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     meta = 1000
 
-    minutos_actuales = row[semanas[-3:]].sum()
+    minutos_actuales = row[semanas[-4:]].sum()
 
     faltante = meta - minutos_actuales
 
     if faltante > 0:
-       st.write(f"🎯 Te faltan **{faltante:.0f} min** para llegar a 1000")
+       st.write(f"🎯 Te faltaron **{faltante:.0f} min** para llegar a 1000")
     else:
-        st.success(f"🏆 ¡Ya superaste los 1000 min! (+{abs(faltante):.0f})")
-
-# -----------------------------------
-# PREDICCIÓN FUTURA (REGRESIÓN SEGURA)
-# -----------------------------------
-
-    st.subheader("🔮 Predicción semana 12")
-
-# Tomar últimas 4 semanas
-    ultimas_4 = minutos[-4:]
-
-# Convertir a numérico (forzando limpieza)
-    y = pd.to_numeric(ultimas_4.values, errors='coerce')
-
-# Convertir semanas a números
-    x = np.array([int(s.split()[1]) for s in ultimas_4.index], dtype=float)
-
-# Eliminar NaNs (por si había basura)
-    mask = ~np.isnan(y)
-    x = x[mask]
-    y = y[mask]
-
-# Validar que haya suficientes datos
-    if len(x) >= 2:
-
-        coef = np.polyfit(x, y, 1)
-        m, b = coef
-
-        semanas_futuras = [x[-1] + 1]
-
-        predicciones = {}
-
-        for s in semanas_futuras:
-            pred = m * s + b
-            pred = max(pred, 0)
-            predicciones[f"Semana {int(s)}"] = pred
-
-        for semana, valor in predicciones.items():
-            st.write(f"{semana}: **{valor:.1f} min**")
-
-        total_estimado = minutos.sum() + sum(predicciones.values())
-        st.write(f"🏁 Total proyectado: **{total_estimado:.0f} min**")
-
-        st.caption(f"Modelo: y = {m:.2f}x + {b:.2f}")
-
-    else:
-        st.warning("⚠️ No hay suficientes datos válidos para hacer predicción")    
+        st.success(f"🏆 ¡Lograste superar los 1000 min! (+{abs(faltante):.0f})")
 
     # -----------------------------------
     # TROFEOS
@@ -415,9 +378,6 @@ if nombre and nombre != "🏆 Salón de la Fama":
     # Posición general (siempre aparece)
     st.info(f"🎖 Posición general actual: **#{ranking_general}**")
     mejor_global = df[semanas].max().max()
-
-    if mejor == mejor_global:
-        st.success(f"🏆 Mejor tiempo histórico ({mejor} min en {semana_mejor})")
 
     mejor_mes1 = df[semanas[:4]].max().max()
 
@@ -431,10 +391,10 @@ if nombre and nombre != "🏆 Salón de la Fama":
         semana = row[semanas[4:8]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 2 ({row[semana]} min en {semana})")
 
-    mejor_mes3 = df[semanas[9:11]].max().max()
+    mejor_mes3 = df[semanas[9:12]].max().max()
 
-    if row[semanas[9:11]].max() == mejor_mes3:
-        semana = row[semanas[9:11]].idxmax()
+    if row[semanas[9:12]].max() == mejor_mes3:
+        semana = row[semanas[9:12]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 3 ({row[semana]} min en {semana})")
 
     # Rey/Reina del podio (con empates)
@@ -446,7 +406,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
     ganadores_podio = df.loc[podios == max_podios, "Nombre"].tolist()
 
     if nombre in ganadores_podio:
-        st.success(f"👑 Rey/Reina del podio ({max_podios} semanas #1)")
+        st.success(f"👑 Monarca del podio ({max_podios} semanas #1)")
 
     # Tendencia positiva
 
