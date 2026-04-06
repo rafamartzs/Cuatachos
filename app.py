@@ -196,9 +196,9 @@ if nombre == "🏆 Salón de la Fama":
         f"Miriam Sarreón"
     )
     st.subheader("🥇Mayor racha de semanas en #1")
-        st.success(
-            f"Miriam Sarreón (Semanas 5, 6 y 7 "
-        )
+    st.success(
+        f"Miriam Sarreón (Semanas 5, 6 y 7 "
+    )
     st.write(f"📈 Semana con más minutos: **{semana_record}** ({totales_semana.max()} min)")
 
     # Estabilidad
