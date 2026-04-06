@@ -82,11 +82,11 @@ if nombre == "🏆 Salón de la Fama":
 
     if despertaron:
         st.write("🌅 Despertaron:")
-        st.write(**", ".join(despertaron)**)
+        st.markdown(f"**{', '.join(despertaron)}**")
 
     if durmieron:
         st.write("😴 Se durmieron:")
-        st.write(**", ".join(durmieron)**)
+        st.markdown(f"**{', '.join(durmieron)}**")
 
     st.write(f"⚡ Mayor activación: **{atleta_activacion}** (+{diff.max()} min)")
     st.write(f"😴 Mayor relajación: **{atleta_relajado}** ({diff.min()} min)")
