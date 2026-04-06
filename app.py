@@ -185,17 +185,20 @@ if nombre == "🏆 Salón de la Fama":
     totales_semana = df[semanas].sum()
 
     semana_record = totales_semana.idxmax()
-    st.write(f"Atletas que han logrado 1000 minutos más rápido")
+    st.subheader("⚡Atletas que han logrado 1000 minutos más rápido")
     st.success(
-        f"Gaby Rodríguez (Semanas 5 y 6)"
-        f"Miriam Sarreón (Semanas 5 y 6)"
-        f"Romario Velázquez (Semanas 9 y 10)"
+        f"Gaby Rodríguez (Semanas 5 y 6), "
+        f"Miriam Sarreón (Semanas 5 y 6), "
+        f"Romario Velázquez (Semanas 9 y 10) "
     )
-    st.write(f"Atletas que fueron mordidos por un perro")
+    st.subheader("🐶Atletas que fueron mordidos por un perro")
     st.success(
         f"Miriam Sarreón"
     )
-
+    st.subheader("🥇Mayor racha de semanas en #1")
+        st.success(
+            f"Miriam Sarreón (Semanas 5, 6 y 7 "
+        )
     st.write(f"📈 Semana con más minutos: **{semana_record}** ({totales_semana.max()} min)")
 
     # Estabilidad
