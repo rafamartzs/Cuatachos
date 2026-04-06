@@ -304,7 +304,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     minutos = row[semanas]
 
-    st.title(f"📊 Estadísticas de {nombre}")
+    st.title(f"📊 Cifras de {nombre}")
 
     mejor = minutos.max()
     semana_mejor = minutos.idxmax()
@@ -321,7 +321,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
     ranking_m2 = row["Ranking Mens. 2"]
     ranking_m3 = row["Ranking Mens. 3"]
 
-    st.header("📊 Estadísticas principales")
+    st.header("Estadísticas principales")
 
     st.write(f"🔥 Mejor semana: **{mejor} min ({semana_mejor})**")
     st.write(f"📊 Promedio semanal: **{promedio:.1f} min**")
@@ -343,7 +343,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.write(f"Mes 1: **#{ranking_m1}**")
     st.write(f"Mes 2: **#{ranking_m2}**")
-    st.write(f"Mes 3 (to date): **#{ranking_m3}** {flecha}")
+    st.write(f"Mes 3: **#{ranking_m3}** {flecha}")
 
     # Saltos personales
 
@@ -482,7 +482,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.subheader("📊 Ranking de minutos Mes 3")
 
-    semanas_mes3 = semanas[-3:]
+    semanas_mes3 = semanas[-4:]
 
     df_mes3 = df[["Nombre"] + semanas_mes3].copy()
 
