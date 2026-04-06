@@ -186,13 +186,13 @@ if nombre == "🏆 Salón de la Fama":
 
     semana_record = totales_semana.idxmax()
     st.write(f"Atletas que han logrado 1000 minutos más rápido")
-    st.sucess(
+    st.success(
         f"Gaby Rodríguez (Semanas 5 y 6)"
         f"Miriam Sarreón (Semanas 5 y 6)"
         f"Romario Velázquez (Semanas 9 y 10)"
     )
     st.write(f"Atletas que fueron mordidos por un perro")
-    st.sucess(
+    st.success(
         f"Miriam Sarreón"
     )
 
