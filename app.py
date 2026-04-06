@@ -362,16 +362,16 @@ if nombre and nombre != "🏆 Salón de la Fama":
     # PROGRESO A 1000 MIN (MES 3)
     # -----------------------------------
 
-    meta = 1000
+    meta = 3000
 
-    minutos_actuales = row[semanas[-4:]].sum()
+    minutos_actuales = row[semanas[-12:]].sum()
 
     faltante = meta - minutos_actuales
 
     if faltante > 0:
-       st.write(f"🎯 Te faltaron **{faltante:.0f} min** para llegar a 1000")
+       st.write(f"🎯 Te faltaron **{faltante:.0f} min** para llegar a 3000")
     else:
-        st.success(f"🏆 ¡Lograste superar los 1000 min! (+{abs(faltante):.0f})")
+        st.success(f"🏆 ¡Lograste superar los 3000 minutos del reto! (+{abs(faltante):.0f})")
 
     # -----------------------------------
     # TROFEOS
