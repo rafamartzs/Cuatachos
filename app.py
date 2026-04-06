@@ -191,7 +191,7 @@ if nombre == "🏆 Salón de la Fama":
     st.success("Gaby Rodríguez (Semanas 5 y 6)")
     st.success("Miriam Sarreón (Semanas 5 y 6)")
     st.success("Romario Velázquez (Semanas 9 y 10)")
-    )
+   
     st.subheader("🐶Atletas que fueron mordidos por un perro:")
     st.success("Miriam Sarreón")
 
