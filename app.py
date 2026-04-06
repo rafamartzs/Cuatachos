@@ -517,6 +517,8 @@ if nombre and nombre != "🏆 Salón de la Fama":
     colors_total = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_total_sorted["Nombre"]]
     fig3, ax3 = plt.subplots(figsize=(10,5))
     ax3.bar(df_total_sorted["Nombre"], df_total_sorted["Total General"], color=colors_total)
+    ax3.axhline(y=3000, color='red', linestyle='--', linewidth=2, label='Objetivo 3000 min')
+    ax3.legend()
     ax3.set_ylabel("Minutos Totales")
     ax3.set_xlabel("Atletas")
     ax3.set_title("Ranking de minutos Total General")
