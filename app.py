@@ -217,7 +217,7 @@ if nombre == "🏆 Salón de la Fama":
     st.subheader("🎯 Atleta más estable:")
     st.success(f"**{atleta_estable}** (σ = {df_std.min():.2f})")
     st.subheader("🌪 Atleta más variable:")
-    st.write(f"**{atleta_variable}** (σ = {df_std.max():.2f})")
+    st.success(f"**{atleta_variable}** (σ = {df_std.max():.2f})")
 
     podios = (df[rank_semanas] == 1).sum(axis=1)
 
