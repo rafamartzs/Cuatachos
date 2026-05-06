@@ -516,5 +516,5 @@ if nombre and nombre != "🏆 Salón de la Fama":
     ax_rank.set_ylabel("Ranking acumulado")
     ax_rank.set_title("Carrera por el ranking general")
 
-   plt.xticks(rotation=45)
-   st.pyplot(fig_rank)
+    plt.xticks(rotation=45)
+    st.pyplot(fig_rank)
