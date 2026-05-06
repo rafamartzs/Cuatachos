@@ -164,7 +164,7 @@ if nombre == "🏆 Salón de la Fama":
     st.success("Ed Guillén (Semanas 1 y 2)")
     st.success("Miriam Sarreón (Semanas 1 y 2)")
     st.success("Gaby Rodríguez (Semanas 1 y 2)")
-    st.success("Romario Velázquez (Semanas 1 y 2)")
+    st.success("Roma Velázquez (Semanas 1 y 2)")
     st.success("Luis Sarreón (Semanas 1 y 2)")
 
 
@@ -434,52 +434,36 @@ if nombre and nombre != "🏆 Salón de la Fama":
 # GRÁFICAS GENERALES
 # =================================================
 
- # Ranking minutos mes 3
+ # Ranking minutos mes 1
 
-    st.subheader("📊 Ranking de minutos Mes 3")
+    st.subheader("📊 Ranking de minutos Mes 1")
 
-    semanas_mes3 = semanas[-4:]
+    semanas_mes1 = semanas[-4:]
 
-    df_mes3 = df[["Nombre"] + semanas_mes3].copy()
+    df_mes1 = df[["Nombre"] + semanas_mes1].copy()
 
-    df_mes3["Total Mes3"] = df_mes3[semanas_mes3].sum(axis=1)
+    df_mes1["Total Mes1"] = df_mes1[semanas_mes1].sum(axis=1)
 
-    df_mes3_sorted = df_mes3.sort_values("Total Mes3", ascending=False)
+    df_mes1_sorted = df_mes1.sort_values("Total Mes1", ascending=False)
 
-    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes3_sorted["Nombre"]]
+    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes1_sorted["Nombre"]]
 
     fig2, ax2 = plt.subplots(figsize=(10,5))
 
-    ax2.bar(df_mes3_sorted["Nombre"], df_mes3_sorted["Total Mes3"], color=colors)
+    ax2.bar(df_mes3_sorted["Nombre"], df_mes1_sorted["Total Mes1"], color=colors)
     
     ax2.axhline(y=1000, color='red', linestyle='--', linewidth=2, label='Objetivo 1000 min')
     ax2.legend()
 
-    ax2.set_ylabel("Minutos Mes 3")
+    ax2.set_ylabel("Minutos Mes 1")
 
     ax2.set_xlabel("Atletas")
 
-    ax2.set_title("Ranking de minutos Mes 3")
+    ax2.set_title("Ranking de minutos Mes 1")
 
     plt.xticks(rotation=45, ha="right")
 
     st.pyplot(fig2)
-
-# Ranking minutos totales
-    st.subheader("📊 Ranking de minutos Total General")
-    df_total = df[["Nombre"] + semanas].copy()
-    df_total["Total General"] = df_total[semanas].sum(axis=1)
-    df_total_sorted = df_total.sort_values("Total General", ascending=False)
-    colors_total = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_total_sorted["Nombre"]]
-    fig3, ax3 = plt.subplots(figsize=(10,5))
-    ax3.bar(df_total_sorted["Nombre"], df_total_sorted["Total General"], color=colors_total)
-    ax3.axhline(y=3000, color='red', linestyle='--', linewidth=2, label='Objetivo 3000 min')
-    ax3.legend()
-    ax3.set_ylabel("Minutos Totales")
-    ax3.set_xlabel("Atletas")
-    ax3.set_title("Ranking de minutos Total General")
-    plt.xticks(rotation=45, ha="right")
-    st.pyplot(fig3)
 
 
  # =================================================
