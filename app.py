@@ -450,7 +450,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     fig2, ax2 = plt.subplots(figsize=(10,5))
 
-    ax2.bar(df_mes3_sorted["Nombre"], df_mes1_sorted["Total Mes1"], color=colors)
+    ax2.bar(df_mes1_sorted["Nombre"], df_mes1_sorted["Total Mes1"], color=colors)
     
     ax2.axhline(y=1000, color='red', linestyle='--', linewidth=2, label='Objetivo 1000 min')
     ax2.legend()
