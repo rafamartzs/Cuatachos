@@ -1,4 +1,4 @@
-import streamlit as st
+﻿import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -56,7 +56,7 @@ if nombre == "🏆 Salón de la Fama":
 
     st.title("🏆 Salón de la Fama del Reto")
 
-    st.header(f"🔥 Lo que pasó en la {ultima_semana}")
+    st.header(f"🔥 Lo que pasó en la {ultima_semana}:")
 
     atletas_moviendose = (df[ultima_semana] > 0).sum()
 
@@ -65,6 +65,8 @@ if nombre == "🏆 Salón de la Fama":
     promedio = minutos_totales / atletas_moviendose if atletas_moviendose > 0 else 0
 
     despertaron = df[(df[semana_previa] == 0) & (df[ultima_semana] > 0)]["Nombre"].tolist()
+    
+    durmieron = df[(df[semana_previa] > 0) & (df[ultima_semana] == 0)]["Nombre"].tolist()
 
     diff = df[ultima_semana] - df[semana_previa]
 
@@ -80,23 +82,65 @@ if nombre == "🏆 Salón de la Fama":
 
     if despertaron:
         st.write("🌅 Despertaron:")
-        st.write(", ".join(despertaron))
+        st.markdown(f"**{', '.join(despertaron)}**")
+
+    if durmieron:
+        st.write("😴 Se durmieron:")
+        st.markdown(f"**{', '.join(durmieron)}**")
 
     st.write(f"⚡ Mayor activación: **{atleta_activacion}** (+{diff.max()} min)")
     st.write(f"😴 Mayor relajación: **{atleta_relajado}** ({diff.min()} min)")
 
-    st.subheader("🥇 Top 3 de la semana")
+    st.subheader("🥇 Top 3 de la semana:")
 
     top3_semana = df.sort_values(ultima_semana, ascending=False).head(3)
 
     for _, row in top3_semana.iterrows():
-        st.write(f"{row['Nombre']} — {row[ultima_semana]} min")
+        st.write(f"**{row['Nombre']} — {row[ultima_semana]} min**")
 
+# -----------------------------------
+# Tendencia positiva
+# -----------------------------------
+
+    def tendencia_positiva_hasta_final(serie):
+    # Convertir a numérico y conservar los 0 como cortadores de tendencia
+        serie = pd.to_numeric(serie, errors="coerce").fillna(0)
+
+        count = 0
+
+        for i in range(1, len(serie)):
+            if serie.iloc[i] > serie.iloc[i - 1] and serie.iloc[i] != 0:
+                count += 1
+            else:
+                count = 0
+
+    # Solo cuenta si la tendencia positiva llega hasta la última semana
+        if len(serie) >= 2 and serie.iloc[-1] > serie.iloc[-2] and serie.iloc[-1] != 0:
+            return count + 1
+        else:
+            return 0
+
+# Calcular tendencias
+    tendencias_final = df[semanas].apply(tendencia_positiva_hasta_final, axis=1)
+
+    max_tendencia = tendencias_final.max()
+
+    if max_tendencia > 0:
+        ganadores = df.loc[tendencias_final == max_tendencia, "Nombre"].tolist()
+    
+        nombres = ", ".join(ganadores)
+    
+        st.subheader("Tendencias:")
+    
+        if len(ganadores) == 1:
+            st.write(f"🏅 Golden Trend Athlete: **{nombres}** ({max_tendencia} semanas con tendencia positiva)")
+        else:
+            st.write(f"🏅 Golden Trend Athletes: **{nombres}** ({max_tendencia} semanas con tendencia positiva)")
     # -----------------------------------
     # RÉCORDS HISTÓRICOS
     # -----------------------------------
 
-    st.header("🏛️ Récords del reto")
+    st.header("🏛️ Récords del reto:")
 
     records = []
 
@@ -108,45 +152,64 @@ if nombre == "🏆 Salón de la Fama":
 
     top3 = records_df.sort_values("Minutos", ascending=False).head(3)
 
-    st.subheader("🥇 Mejores semanas históricas")
+    st.subheader("🥇 Mejores tiempos históricos:")
 
     for _, r in top3.iterrows():
-        st.write(f"{r['Nombre']} — {r['Semana']} — {r['Minutos']} min")
+        st.success(f"{r['Nombre']} — {r['Semana']} — {r['Minutos']} min")
 
     totales_semana = df[semanas].sum()
 
     semana_record = totales_semana.idxmax()
+    st.subheader("⚡Atletas que han logrado 1000 minutos más rápido:")
+    st.success("Ed Guillén (Semanas 1 y 2)")
+    st.success("Miriam Sarreón (Semanas 1 y 2)")
+    st.success("Gaby Rodríguez (Semanas 1 y 2)")
+    st.success("Romario Velázquez (Semanas 1 y 2)")
+    st.success("Luis Sarreón (Semanas 1 y 2)")
 
-    st.write(f"📈 Semana con más minutos: **{semana_record}** ({totales_semana.max()} min)")
 
     # Estabilidad
 
-    df_std = df[semanas].replace(0, np.nan).std(axis=1)
+    # Contar semanas en 0
+    semanas_cero = (df[semanas] == 0).sum(axis=1)
+
+# Filtrar atletas con menos de 2 semanas en 0
+    df_filtrado = df[semanas_cero < 2].copy()
+
+# Calcular desviación estándar ignorando ceros
+    df_std = df_filtrado[semanas].replace(0, np.nan).std(axis=1)
 
     idx_estable = df_std.idxmin()
     idx_variable = df_std.idxmax()
 
-    atleta_estable = df.loc[idx_estable, "Nombre"]
-    atleta_variable = df.loc[idx_variable, "Nombre"]
-
-    st.write(f"🎯 Atleta más estable: **{atleta_estable}** (σ = {df_std.min():.2f})")
-    st.write(f"🌪 Atleta más variable: **{atleta_variable}** (σ = {df_std.max():.2f})")
-
-    # Rey del podio
+    atleta_estable = df_filtrado.loc[idx_estable, "Nombre"]
+    atleta_variable = df_filtrado.loc[idx_variable, "Nombre"]
+    st.subheader("🎯 Atleta más estable:")
+    st.success(f"**{atleta_estable}** (σ = {df_std.min():.2f})")
+    st.subheader("🌪 Atleta más variable:")
+    st.success(f"**{atleta_variable}** (σ = {df_std.max():.2f})")
 
     podios = (df[rank_semanas] == 1).sum(axis=1)
 
-    atleta_podio = df.loc[podios.idxmax(), "Nombre"]
+    max_podios = podios.max()
 
-    st.write(f"👑 Rey/Reina del podio: **{atleta_podio}** ({podios.max()} semanas #1)")
+    ganadores = df.loc[podios == max_podios, "Nombre"].tolist()
 
+    nombres = ", ".join(ganadores)
+
+    if len(ganadores) == 1:
+        st.subheader("👑 Monarca del podio:")
+        st.success(f"**{nombres}** ({max_podios} semanas #1)")
+    else:
+        st.subheader("👑 Monarcas del podio:")
+        st.success(f"**{nombres}** ({max_podios} semanas #1)")
     # Consistencia perfecta
 
     consistentes = df[(df[semanas] == 0).sum(axis=1) == 0]["Nombre"]
 
     if len(consistentes) > 0:
-        st.write("💎 Consistencia perfecta:")
-        st.write(", ".join(consistentes))
+        st.subheader("💎 Consistencia perfecta:")
+        st.success(", ".join(consistentes))
 
     # Activación histórica
 
@@ -157,19 +220,21 @@ if nombre == "🏆 Salón de la Fama":
 
     atleta = df.loc[idx[0], "Nombre"]
     semana = idx[1]
-
-    st.write(f"⚡ Mayor activación histórica: **{atleta}** (+{mayor_activacion} min en {semana})")
+    st.subheader("⚡ Mayor activación histórica:")
+    st.success(f"**{atleta}** (+{mayor_activacion} min en {semana})")
 
     mayor_bajon = diffs.min().min()
     idx = diffs.stack().idxmin()
 
     atleta = df.loc[idx[0], "Nombre"]
     semana = idx[1]
+    st.subheader("📉 Mayor bajón histórico:")
+    st.success(f"**{atleta}** ({mayor_bajon} min en {semana})")
 
-    st.write(f"📉 Mayor bajón histórico: **{atleta}** ({mayor_bajon} min en {semana})")
+    st.write(f"📈 Semana con más minutos: **{semana_record}** ({totales_semana.max()} min)")
 # MVPs semanales
 
-    st.subheader("🥇 MVPs semanales")
+    st.subheader("🥇 MVPs semanales:")
 
     for semana in semanas:
  
@@ -179,13 +244,25 @@ if nombre == "🏆 Salón de la Fama":
 
         minutos = df.loc[idx, semana]
 
-        st.write(f"{semana} — {atleta} ({minutos} min)")
+        st.success(f"{semana} — {atleta} ({minutos} min)")
 
-    st.subheader("👥 Análisis por género")
+    st.subheader("Minutos por género:")
 
     df_genero = df.groupby("Sexo")[semanas].sum().sum(axis=1)
 
     st.bar_chart(df_genero)
+
+    st.subheader("Promedio por edades")
+
+    df_edades = df.groupby("Edades")["Total"].mean().sort_values(ascending=False)
+
+    st.bar_chart(df_edades)
+
+    st.subheader("Promedio por regiones:")
+
+    df_regiones = df.groupby("Regiones")["Total"].mean().sort_values(ascending=False)
+
+    st.bar_chart(df_regiones)
 
 # =====================================================
 # PANEL INDIVIDUAL
@@ -197,7 +274,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     minutos = row[semanas]
 
-    st.title(f"📊 Estadísticas de {nombre}")
+    st.title(f"📊 Cifras de {nombre}")
 
     mejor = minutos.max()
     semana_mejor = minutos.idxmax()
@@ -210,10 +287,8 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     ranking_general = row["Ranking general"]
 
-    ranking_m1 = row["Ranking Mens. 1"]
-    ranking_m2 = row["Ranking Mens. 2"]
-
-    st.header("📊 Estadísticas principales")
+    
+    st.header("Estadísticas principales")
 
     st.write(f"🔥 Mejor semana: **{mejor} min ({semana_mejor})**")
     st.write(f"📊 Promedio semanal: **{promedio:.1f} min**")
@@ -224,17 +299,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
     st.write(f"🌎 Contribución al total: **{contribucion:.2f}%**")
     st.write(f"🏆 Ranking general: **#{ranking_general}**")
 
-    # Cambio de ranking
-
-    if ranking_m2 < ranking_m1:
-        flecha = "⬆️"
-    elif ranking_m2 > ranking_m1:
-        flecha = "⬇️"
-    else:
-        flecha = "➡️"
-
-    st.write(f"Mes 1: **#{ranking_m1}**")
-    st.write(f"Mes 2: **#{ranking_m2}** {flecha}")
+    
 
     # Saltos personales
 
@@ -250,55 +315,19 @@ if nombre and nombre != "🏆 Salón de la Fama":
     st.write(f"📉 Mayor bajón: **{bajon} min ({semana_bajon})**")
 
     # -----------------------------------
-    # PROGRESO A 1000 MIN (MES 3)
+    # PROGRESO A 1000 MIN (MES 1)
     # -----------------------------------
 
     meta = 1000
 
-    minutos_actuales = row[ultima_semana]
+    minutos_actuales = row[semanas[-2:]].sum()
 
     faltante = meta - minutos_actuales
 
     if faltante > 0:
        st.write(f"🎯 Te faltan **{faltante:.0f} min** para llegar a 1000")
     else:
-        st.success(f"🏆 ¡Ya superaste los 1000 min! (+{abs(faltante):.0f})")
-
-# -----------------------------------
-# PREDICCIÓN FUTURA (REGRESIÓN)
-# -----------------------------------
-
-    st.subheader("🔮 Predicción semanas 10–12 (regresión)")
-
-# Tomar últimas 4 semanas
-    ultimas_4 = minutos[-4:]
-
-# Convertir semanas a números (ej: "Semana 6" → 6)
-    x = [int(s.split()[1]) for s in ultimas_4.index]
-    y = ultimas_4.values
-
-# Ajustar regresión lineal
-    coef = np.polyfit(x, y, 1)  # grado 1 = línea
-    m, b = coef
-
-# Semanas futuras
-    semanas_futuras = [x[-1] + 1, x[-1] + 2, x[-1] + 3]
-
-    predicciones = {}
-
-    for s in semanas_futuras:
-        pred = m * s + b
-        pred = max(pred, 0)  # evitar negativos
-        predicciones[f"Semana {s}"] = pred
-
-# Mostrar predicciones
-    for semana, valor in predicciones.items():
-       st.write(f"{semana}: **{valor:.1f} min**")
-
-# Total proyectado
-    total_estimado = minutos.sum() + sum(predicciones.values())
-
-    st.write(f"🏁 Total proyectado: **{total_estimado:.0f} min**")
+        st.success(f"🏆 ¡Lograste superar los 1000 minutos del mes 1! (+{abs(faltante):.0f})")
 
     # -----------------------------------
     # TROFEOS
@@ -308,9 +337,6 @@ if nombre and nombre != "🏆 Salón de la Fama":
     # Posición general (siempre aparece)
     st.info(f"🎖 Posición general actual: **#{ranking_general}**")
     mejor_global = df[semanas].max().max()
-
-    if mejor == mejor_global:
-        st.success(f"🏆 Mejor tiempo histórico ({mejor} min en {semana_mejor})")
 
     mejor_mes1 = df[semanas[:4]].max().max()
 
@@ -324,12 +350,22 @@ if nombre and nombre != "🏆 Salón de la Fama":
         semana = row[semanas[4:8]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 2 ({row[semana]} min en {semana})")
 
-    # Rey del podio
+    mejor_mes3 = df[semanas[9:12]].max().max()
+
+    if row[semanas[9:12]].max() == mejor_mes3:
+        semana = row[semanas[9:12]].idxmax()
+        st.success(f"🥇 Mejor tiempo Mes 3 ({row[semana]} min en {semana})")
+
+    # Rey/Reina del podio (con empates)
 
     podios = (df[rank_semanas] == 1).sum(axis=1)
 
-    if nombre == df.loc[podios.idxmax(), "Nombre"]:
-        st.success(f"👑 Rey/Reina del podio ({podios.max()} semanas #1)")
+    max_podios = podios.max()
+
+    ganadores_podio = df.loc[podios == max_podios, "Nombre"].tolist()
+
+    if nombre in ganadores_podio:
+        st.success(f"👑 Monarca del podio ({max_podios} semanas #1)")
 
     # Tendencia positiva
 
@@ -354,12 +390,19 @@ if nombre and nombre != "🏆 Salón de la Fama":
     if nombre == atleta_salto:
         st.success(f"⚡ Mayor salto de activación histórico (+{mayor_salto} min en {semana_salto})")
 
-    # Estabilidad
+    # Estabilidad (solo atletas con menos de 2 semanas en 0)
 
-    df_std = df[semanas].replace(0, np.nan).std(axis=1)
+    semanas_cero = (df[semanas] == 0).sum(axis=1)
 
-    if nombre == df.loc[df_std.idxmin(), "Nombre"]:
-        st.success("🎯 Atleta más estable del reto")
+    df_filtrado = df[semanas_cero < 2].copy()
+
+    if not df_filtrado.empty:
+        df_std = df_filtrado[semanas].replace(0, np.nan).std(axis=1)
+
+        idx_estable = df_std.idxmin()
+
+        if nombre == df_filtrado.loc[idx_estable, "Nombre"]:
+            st.success(f"🎯 Atleta más estable del reto (σ = {df_std.min():.2f})")
 
     # Consistencia perfecta
 
@@ -395,11 +438,11 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.subheader("📊 Ranking de minutos Mes 3")
 
-    ultima_semana = semanas[-2]
+    semanas_mes3 = semanas[-4:]
 
-    df_mes3 = df[["Nombre", ultima_semana]].copy()
+    df_mes3 = df[["Nombre"] + semanas_mes3].copy()
 
-    df_mes3["Total Mes3"] = df_mes3[ultima_semana]
+    df_mes3["Total Mes3"] = df_mes3[semanas_mes3].sum(axis=1)
 
     df_mes3_sorted = df_mes3.sort_values("Total Mes3", ascending=False)
 
@@ -408,6 +451,9 @@ if nombre and nombre != "🏆 Salón de la Fama":
     fig2, ax2 = plt.subplots(figsize=(10,5))
 
     ax2.bar(df_mes3_sorted["Nombre"], df_mes3_sorted["Total Mes3"], color=colors)
+    
+    ax2.axhline(y=1000, color='red', linestyle='--', linewidth=2, label='Objetivo 1000 min')
+    ax2.legend()
 
     ax2.set_ylabel("Minutos Mes 3")
 
@@ -419,25 +465,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.pyplot(fig2)
 
-# -----------------------------------
-# HISTOGRAMA DE MINUTOS
-# -----------------------------------
-
-    st.subheader("📊 Distribución de minutos")
-
-    fig_hist, ax_hist = plt.subplots()
-
-    valores = minutos.replace(0, np.nan).dropna()
-
-    ax_hist.hist(valores)
-
-    ax_hist.set_xlabel("Minutos")
-    ax_hist.set_ylabel("Frecuencia")
-    ax_hist.set_title("Distribución de minutos por semana")
-
-    st.pyplot(fig_hist)
-
- # Ranking minutos totales
+# Ranking minutos totales
     st.subheader("📊 Ranking de minutos Total General")
     df_total = df[["Nombre"] + semanas].copy()
     df_total["Total General"] = df_total[semanas].sum(axis=1)
@@ -445,11 +473,14 @@ if nombre and nombre != "🏆 Salón de la Fama":
     colors_total = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_total_sorted["Nombre"]]
     fig3, ax3 = plt.subplots(figsize=(10,5))
     ax3.bar(df_total_sorted["Nombre"], df_total_sorted["Total General"], color=colors_total)
+    ax3.axhline(y=3000, color='red', linestyle='--', linewidth=2, label='Objetivo 3000 min')
+    ax3.legend()
     ax3.set_ylabel("Minutos Totales")
     ax3.set_xlabel("Atletas")
     ax3.set_title("Ranking de minutos Total General")
     plt.xticks(rotation=45, ha="right")
     st.pyplot(fig3)
+
 
  # =================================================
  # GRÁFICA DE EVOLUCIÓN DEL RANKING SEMANAL
@@ -480,41 +511,3 @@ if nombre and nombre != "🏆 Salón de la Fama":
     plt.xticks(rotation=45)
     st.pyplot(fig4)
 
-# =================================================
-# EVOLUCIÓN DEL RANKING GENERAL (ACUMULADO)
-# =================================================
-
-    st.subheader("🏁 Evolución del ranking general (acumulado)")
-
-# Construir acumulados semana a semana
-    df_acum = df[["Nombre"] + semanas].copy()
-
-    for i, semana in enumerate(semanas):
-        if i == 0:
-            df_acum[semana] = df[semana]
-        else:
-            df_acum[semana] = df_acum[semanas[:i+1]].sum(axis=1)
-
-# Calcular ranking por semana
-    ranking_acum = pd.DataFrame()
-    ranking_acum["Nombre"] = df["Nombre"]
-
-    for semana in semanas:
-        ranking_acum[semana] = df_acum[semana].rank(ascending=False, method="min")
-
-# Plot
-    fig_rank, ax_rank = plt.subplots(figsize=(12,6))
-
-    for i, row in ranking_acum.iterrows():
-        if row["Nombre"] == nombre:
-            ax_rank.plot(semanas, row[semanas], marker='o', linewidth=3)
-        else:
-            ax_rank.plot(semanas, row[semanas], marker='o', linewidth=1, alpha=0.4)
-
-    ax_rank.invert_yaxis()
-    ax_rank.set_xlabel("Semanas")
-    ax_rank.set_ylabel("Ranking acumulado")
-    ax_rank.set_title("Carrera por el ranking general")
-
-    plt.xticks(rotation=45)
-    st.pyplot(fig_rank)
