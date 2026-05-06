@@ -320,7 +320,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     meta = 1000
 
-    minutos_actuales = row[semanas[-2:]].sum()
+    minutos_actuales = row[semanas[-3:]].sum()
 
     faltante = meta - minutos_actuales
 
