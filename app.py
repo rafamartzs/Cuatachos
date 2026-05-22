@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -166,9 +166,9 @@ if nombre == "🏆 Salón de la Fama":
     st.success("Gaby Rodríguez (Semanas 1 y 2)")
     st.success("Roma Velázquez (Semanas 1 y 2)")
     st.success("Luis Sarreón (Semanas 1 y 2)")
+   
 
-
-    # Estabilidad
+   # Estabilidad
 
     # Contar semanas en 0
     semanas_cero = (df[semanas] == 0).sum(axis=1)
@@ -287,7 +287,9 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     ranking_general = row["Ranking general"]
 
-    
+    ranking_m1 = row["Ranking Mens. 1"]
+    ranking_m2 = row["Ranking Mens. 2"]
+ 
     st.header("Estadísticas principales")
 
     st.write(f"🔥 Mejor semana: **{mejor} min ({semana_mejor})**")
@@ -299,8 +301,18 @@ if nombre and nombre != "🏆 Salón de la Fama":
     st.write(f"🌎 Contribución al total: **{contribucion:.2f}%**")
     st.write(f"🏆 Ranking general: **#{ranking_general}**")
 
-    
+    # Cambio de ranking
 
+    if ranking_m2 < ranking_m1:
+        flecha = "⬆️"
+    elif ranking_m2 > ranking_m1:
+        flecha = "⬇️"
+    else:
+        flecha = "➡️"
+
+    st.write(f"Mes 1: **#{ranking_m1}**")
+    st.write(f"Mes 2 (a la fecha): **#{ranking_m2}**")
+   
     # Saltos personales
 
     diffs = minutos.diff()
@@ -315,19 +327,19 @@ if nombre and nombre != "🏆 Salón de la Fama":
     st.write(f"📉 Mayor bajón: **{bajon} min ({semana_bajon})**")
 
     # -----------------------------------
-    # PROGRESO A 1000 MIN (MES 1)
+    # PROGRESO A 1000 MIN (MES 2)
     # -----------------------------------
 
     meta = 1000
 
-    minutos_actuales = row[semanas[-3:]].sum()
+    minutos_actuales = row[semanas[-1:]].sum()
 
     faltante = meta - minutos_actuales
 
     if faltante > 0:
        st.write(f"🎯 Te faltan **{faltante:.0f} min** para llegar a 1000")
     else:
-        st.success(f"🏆 ¡Lograste superar los 1000 minutos del mes 1! (+{abs(faltante):.0f})")
+        st.success(f"🏆 ¡Lograste superar los 1000 minutos del mes 2! (+{abs(faltante):.0f})")
 
     # -----------------------------------
     # TROFEOS
@@ -344,17 +356,6 @@ if nombre and nombre != "🏆 Salón de la Fama":
         semana = row[semanas[:4]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 1 ({row[semana]} min en {semana})")
 
-    mejor_mes2 = df[semanas[4:8]].max().max()
-
-    if row[semanas[4:8]].max() == mejor_mes2:
-        semana = row[semanas[4:8]].idxmax()
-        st.success(f"🥇 Mejor tiempo Mes 2 ({row[semana]} min en {semana})")
-
-    mejor_mes3 = df[semanas[9:12]].max().max()
-
-    if row[semanas[9:12]].max() == mejor_mes3:
-        semana = row[semanas[9:12]].idxmax()
-        st.success(f"🥇 Mejor tiempo Mes 3 ({row[semana]} min en {semana})")
 
     # Rey/Reina del podio (con empates)
 
@@ -434,36 +435,52 @@ if nombre and nombre != "🏆 Salón de la Fama":
 # GRÁFICAS GENERALES
 # =================================================
 
- # Ranking minutos mes 1
+ # Ranking minutos mes 2
 
-    st.subheader("📊 Ranking de minutos Mes 1")
+    st.subheader("📊 Ranking de minutos Mes 2")
 
-    semanas_mes1 = semanas[-4:]
+    semanas_mes2 = semanas[-1:]
 
-    df_mes1 = df[["Nombre"] + semanas_mes1].copy()
+    df_mes2 = df[["Nombre"] + semanas_mes2].copy()
 
-    df_mes1["Total Mes1"] = df_mes1[semanas_mes1].sum(axis=1)
+    df_mes2["Total Mes2"] = df_mes2[semanas_mes2].sum(axis=1)
 
-    df_mes1_sorted = df_mes1.sort_values("Total Mes1", ascending=False)
+    df_mes2_sorted = df_mes2.sort_values("Total Mes2", ascending=False)
 
-    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes1_sorted["Nombre"]]
+    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes2_sorted["Nombre"]]
 
     fig2, ax2 = plt.subplots(figsize=(10,5))
 
-    ax2.bar(df_mes1_sorted["Nombre"], df_mes1_sorted["Total Mes1"], color=colors)
+    ax2.bar(df_mes3_sorted["Nombre"], df_mes2_sorted["Total Mes2"], color=colors)
     
     ax2.axhline(y=1000, color='red', linestyle='--', linewidth=2, label='Objetivo 1000 min')
     ax2.legend()
 
-    ax2.set_ylabel("Minutos Mes 1")
+    ax2.set_ylabel("Minutos Mes 2")
 
     ax2.set_xlabel("Atletas")
 
-    ax2.set_title("Ranking de minutos Mes 1")
+    ax2.set_title("Ranking de minutos Mes 2")
 
     plt.xticks(rotation=45, ha="right")
 
     st.pyplot(fig2)
+
+# Ranking minutos totales
+    st.subheader("📊 Ranking de minutos Total General")
+    df_total = df[["Nombre"] + semanas].copy()
+    df_total["Total General"] = df_total[semanas].sum(axis=1)
+    df_total_sorted = df_total.sort_values("Total General", ascending=False)
+    colors_total = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_total_sorted["Nombre"]]
+    fig3, ax3 = plt.subplots(figsize=(10,5))
+    ax3.bar(df_total_sorted["Nombre"], df_total_sorted["Total General"], color=colors_total)
+    ax3.axhline(y=3000, color='red', linestyle='--', linewidth=2, label='Objetivo 3000 min')
+    ax3.legend()
+    ax3.set_ylabel("Minutos Totales")
+    ax3.set_xlabel("Atletas")
+    ax3.set_title("Ranking de minutos Total General")
+    plt.xticks(rotation=45, ha="right")
+    st.pyplot(fig3)
 
 
  # =================================================
