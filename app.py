@@ -311,7 +311,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
         flecha = "➡️"
 
     st.write(f"Mes 1: **#{ranking_m1}**")
-    st.write(f"Mes 2 (a la fecha): **#{ranking_m2}**")
+    st.write(f"Mes 2 (a la fecha): **#{ranking_m2}** {flecha}")
    
     # Saltos personales
 
