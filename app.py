@@ -166,7 +166,8 @@ if nombre == "🏆 Salón de la Fama":
     st.success("Gaby Rodríguez (Semanas 1 y 2)")
     st.success("Roma Velázquez (Semanas 1 y 2)")
     st.success("Luis Sarreón (Semanas 1 y 2)")
-   
+    st.success("Miriam Sarreón (Semanas 5 y 6)")
+    st.success("San Jaramillo (Semanas 5 y 6)")
 
    # Estabilidad
 
@@ -332,7 +333,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     meta = 1000
 
-    minutos_actuales = row[semanas[-1:]].sum()
+    minutos_actuales = row[semanas[-2:]].sum()
 
     faltante = meta - minutos_actuales
 
@@ -439,7 +440,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.subheader("📊 Ranking de minutos Mes 2")
 
-    semanas_mes2 = semanas[-1:]
+    semanas_mes2 = semanas[-2:]
 
     df_mes2 = df[["Nombre"] + semanas_mes2].copy()
 
