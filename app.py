@@ -162,11 +162,10 @@ if nombre == "🏆 Salón de la Fama":
     semana_record = totales_semana.idxmax()
     st.subheader("⚡Atletas que han logrado 1000 minutos más rápido:")
     st.success("Ed Guillén (Semanas 1 y 2)")
-    st.success("Miriam Sarreón (Semanas 1 y 2)")
+    st.success("Miriam Sarreón (Semanas 1 y 2), (Semanas 5 y 6)")
     st.success("Gaby Rodríguez (Semanas 1 y 2)")
     st.success("Roma Velázquez (Semanas 1 y 2)")
     st.success("Luis Sarreón (Semanas 1 y 2)")
-    st.success("Miriam Sarreón (Semanas 5 y 6)")
     st.success("San Jaramillo (Semanas 5 y 6)")
 
    # Estabilidad
@@ -333,12 +332,12 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     meta = 1000
 
-    minutos_actuales = row[semanas[-3:]].sum()
+    minutos_actuales = row[semanas[-4:]].sum()
 
     faltante = meta - minutos_actuales
 
     if faltante > 0:
-       st.write(f"🎯 Te faltan **{faltante:.0f} min** para llegar a 1000")
+       st.write(f"🎯 Te faltaron **{faltante:.0f} min** para llegar a 1000")
     else:
         st.success(f"🏆 ¡Lograste superar los 1000 minutos del mes 2! (+{abs(faltante):.0f})")
 
@@ -440,7 +439,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.subheader("📊 Ranking de minutos Mes 2")
 
-    semanas_mes2 = semanas[-3:]
+    semanas_mes2 = semanas[-4:]
 
     df_mes2 = df[["Nombre"] + semanas_mes2].copy()
 
