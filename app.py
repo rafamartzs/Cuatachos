@@ -355,7 +355,12 @@ if nombre and nombre != "🏆 Salón de la Fama":
     if row[semanas[:4]].max() == mejor_mes1:
         semana = row[semanas[:4]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 1 ({row[semana]} min en {semana})")
+    
+    mejor_mes2 = df[semanas[4:8]].max().max()
 
+    if row[semanas[5:8]].max() == mejor_mes2:
+        semana = row[semanas[5:8]].idxmax()
+        st.success(f"🥇 Mejor tiempo Mes 2 ({row[semana]} min en {semana})")
 
     # Rey/Reina del podio (con empates)
 
