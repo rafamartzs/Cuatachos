@@ -333,7 +333,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     meta = 1000
 
-    minutos_actuales = row[semanas[-2:]].sum()
+    minutos_actuales = row[semanas[-3:]].sum()
 
     faltante = meta - minutos_actuales
 
@@ -440,7 +440,7 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     st.subheader("📊 Ranking de minutos Mes 2")
 
-    semanas_mes2 = semanas[-2:]
+    semanas_mes2 = semanas[-3:]
 
     df_mes2 = df[["Nombre"] + semanas_mes2].copy()
 
