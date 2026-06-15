@@ -167,8 +167,8 @@ if nombre == "🏆 Salón de la Fama":
     st.success("Roma Velázquez (Semanas 1 y 2)")
     st.success("Luis Sarreón (Semanas 1 y 2)")
     st.success("San Jaramillo (Semanas 5 y 6)")
-
-   # Estabilidad
+   
+    # Estabilidad
 
     # Contar semanas en 0
     semanas_cero = (df[semanas] == 0).sum(axis=1)
@@ -289,7 +289,8 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     ranking_m1 = row["Ranking Mens. 1"]
     ranking_m2 = row["Ranking Mens. 2"]
- 
+    ranking_m3 = row["Ranking Mens. 3"]
+
     st.header("Estadísticas principales")
 
     st.write(f"🔥 Mejor semana: **{mejor} min ({semana_mejor})**")
@@ -303,16 +304,17 @@ if nombre and nombre != "🏆 Salón de la Fama":
 
     # Cambio de ranking
 
-    if ranking_m2 < ranking_m1:
+    if ranking_m3 < ranking_m2:
         flecha = "⬆️"
-    elif ranking_m2 > ranking_m1:
+    elif ranking_m3 > ranking_m2:
         flecha = "⬇️"
     else:
         flecha = "➡️"
 
     st.write(f"Mes 1: **#{ranking_m1}**")
-    st.write(f"Mes 2 (a la fecha): **#{ranking_m2}** {flecha}")
-   
+    st.write(f"Mes 2: **#{ranking_m2}**")
+    st.write(f"Mes 3 a la fecha: **#{ranking_m3}** {flecha}")
+
     # Saltos personales
 
     diffs = minutos.diff()
@@ -327,19 +329,19 @@ if nombre and nombre != "🏆 Salón de la Fama":
     st.write(f"📉 Mayor bajón: **{bajon} min ({semana_bajon})**")
 
     # -----------------------------------
-    # PROGRESO A 1000 MIN (MES 2)
+    # PROGRESO A 1000 MIN (MES 3)
     # -----------------------------------
 
-    meta = 1000
+    meta = 3000
 
-    minutos_actuales = row[semanas[-4:]].sum()
+    minutos_actuales = row[semanas[-9:]].sum()
 
     faltante = meta - minutos_actuales
 
     if faltante > 0:
-       st.write(f"🎯 Te faltaron **{faltante:.0f} min** para llegar a 1000")
+       st.write(f"🎯 Te faltan **{faltante:.0f} min** para llegar a 3000")
     else:
-        st.success(f"🏆 ¡Lograste superar los 1000 minutos del mes 2! (+{abs(faltante):.0f})")
+        st.success(f"🏆 ¡Lograste superar los 3000 minutos del reto! (+{abs(faltante):.0f})")
 
     # -----------------------------------
     # TROFEOS
@@ -355,13 +357,14 @@ if nombre and nombre != "🏆 Salón de la Fama":
     if row[semanas[:4]].max() == mejor_mes1:
         semana = row[semanas[:4]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 1 ({row[semana]} min en {semana})")
-    
-    mejor_mes2 = df[semanas[4:8]].max().max()
 
-    if row[semanas[5:8]].max() == mejor_mes2:
-        semana = row[semanas[5:8]].idxmax()
+    mejor_mes2 = df[semanas[5:8]].max().max()
+
+    if row[semanas[4:8]].max() == mejor_mes2:
+        semana = row[semanas[4:8]].idxmax()
         st.success(f"🥇 Mejor tiempo Mes 2 ({row[semana]} min en {semana})")
 
+    
     # Rey/Reina del podio (con empates)
 
     podios = (df[rank_semanas] == 1).sum(axis=1)
@@ -440,32 +443,32 @@ if nombre and nombre != "🏆 Salón de la Fama":
 # GRÁFICAS GENERALES
 # =================================================
 
- # Ranking minutos mes 2
+ # Ranking minutos mes 3
 
-    st.subheader("📊 Ranking de minutos Mes 2")
+    st.subheader("📊 Ranking de minutos Mes 3")
 
-    semanas_mes2 = semanas[-4:]
+    semanas_mes3 = semanas[-1:]
 
-    df_mes2 = df[["Nombre"] + semanas_mes2].copy()
+    df_mes3 = df[["Nombre"] + semanas_mes3].copy()
 
-    df_mes2["Total Mes2"] = df_mes2[semanas_mes2].sum(axis=1)
+    df_mes3["Total Mes3"] = df_mes3[semanas_mes3].sum(axis=1)
 
-    df_mes2_sorted = df_mes2.sort_values("Total Mes2", ascending=False)
+    df_mes3_sorted = df_mes3.sort_values("Total Mes3", ascending=False)
 
-    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes2_sorted["Nombre"]]
+    colors = ["#ff69b4" if n == nombre else "#1f77b4" for n in df_mes3_sorted["Nombre"]]
 
     fig2, ax2 = plt.subplots(figsize=(10,5))
 
-    ax2.bar(df_mes2_sorted["Nombre"], df_mes2_sorted["Total Mes2"], color=colors)
+    ax2.bar(df_mes3_sorted["Nombre"], df_mes3_sorted["Total Mes3"], color=colors)
     
     ax2.axhline(y=1000, color='red', linestyle='--', linewidth=2, label='Objetivo 1000 min')
     ax2.legend()
 
-    ax2.set_ylabel("Minutos Mes 2")
+    ax2.set_ylabel("Minutos Mes 3")
 
     ax2.set_xlabel("Atletas")
 
-    ax2.set_title("Ranking de minutos Mes 2")
+    ax2.set_title("Ranking de minutos Mes 3")
 
     plt.xticks(rotation=45, ha="right")
 
